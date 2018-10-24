@@ -20,7 +20,7 @@ public class Green
 	
 	private static World _currentWorld;
 	
-	private final static String VERSION = "##library.prettyVersion##";
+	private final static String VERSION = "a0.1.0";
 	
 	//Constructors
 	public Green(PApplet theParent)
@@ -46,6 +46,10 @@ public class Green
 	public static String getVersion()
 	{
 		return VERSION;
+	}
+	public static float getPointsDist(float x1, float y1, float x2, float y2)
+	{
+		return (float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
 	}
 	
 	//Base Methods

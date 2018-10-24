@@ -61,6 +61,13 @@ public abstract class World
 				retList.add(actors.get(i));
 		return retList;
 	}
+	public final Actor getRandomObject(Class type)
+	{
+		List<Actor> actorList = getObjects(type);
+		if(actorList.size() <= 0)
+			return null;
+		return actorList.get((int) Math.floor(Math.random() * actorList.size()));
+	}
 	
 	//Setters
 	public final void setBackgroundColor(int newColor)

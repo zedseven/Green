@@ -5,6 +5,8 @@ import processing.core.*;
 
 import static processing.core.PApplet.sin;
 import static processing.core.PApplet.cos;
+import static processing.core.PApplet.atan;
+import static processing.core.PApplet.degrees;
 import static processing.core.PApplet.radians;
 
 public abstract class Actor
@@ -21,7 +23,7 @@ public abstract class Actor
 	private float _transparency = 255;
 	
 	//Constructors
-	public Actor(float x, float y, PImage image)
+	public Actor(float x, float y, PImage image) //TODO: Add GIF support
 	{
 		_x = x;
 		_y = y;
@@ -54,6 +56,14 @@ public abstract class Actor
 	{
 		return _y;
 	}
+	public final float getCenterX()
+	{
+		return _x + _width / 2f;
+	}
+	public final float getCenterY()
+	{
+		return _y + _height / 2f;
+	}
 	public final float getRotation()
 	{
 		return _rotation;
@@ -73,6 +83,10 @@ public abstract class Actor
 	public final float getTransparency()
 	{
 		return _transparency;
+	}
+	public static World getWorld()
+	{
+		return Green.getWorld();
 	}
 	
 	//Setters
@@ -135,25 +149,45 @@ public abstract class Actor
 	public final boolean isAtEdge()
 	{
 		World world = Green.getWorld();
-		return (_x + _width / 2 < 0 || _x + _width / 2 > world.getWidth() || _y + _height / 2 < 0 || _y + _height / 2 > world.getHeight());
+		return (getCenterX() < 0 || getCenterX() > world.getWidth() || getCenterY() < 0 || getCenterY() > world.getHeight());
 	}
-	//Coordssystem is down-right +
 	public final Actor getOneIntersectingObject(Class type) //Compares rects of images
 	{
+		//Coords system is down-right +
+		//TODO: Add in rotation support
 		List<Actor> actors = Green.getWorld().getObjects(type);
 		for(Actor actor : actors)
 		{
 			if(actor == this)
 				continue;
-			//if((actors.get(i).getX() - actors.get(i).getWidth() > _x || actors.get(i).getX() < _x + _width) &&
-			//		(actors.get(i).getY() + actors.get(i).getHeight() > _y || actors.get(i).getY() < _y + _height))
-			if(((actor.getX() - actor.getWidth() / 2 > _x - _width / 2 && actor.getX() - actor.getWidth() / 2 < _x + _width / 2) || actor.getX() + actor.getWidth() / 2 < _x + _width / 2)
-				&& (actor.getY() - actor.getHeight() / 2 > _y - _height / 2 || actor.getY() + actor.getHeight() / 2 < _y + _height / 2))
+			if(((actor.getX() > _x && actor.getX() < _x + _width) || (actor.getX() + actor.getWidth() > _x && actor.getX() + actor.getWidth() < _x + _width)) &&
+					((actor.getY() > _y && actor.getY() < _y + _height) || (actor.getY() + actor.getHeight() > _y && actor.getY() + actor.getHeight() < _y + _height)))
 			{
 				return actor;
 			}
 		}
 		return null;
+	}
+	public final List<Actor> getObjectsInRange(float range, Class type)
+	{
+		List<Actor> actors = Green.getWorld().getObjects(type);
+		List<Actor> retList = new ArrayList<Actor>();
+		for(int i = 0; i < actors.size(); i++)
+			if(Green.getPointsDist(getCenterX(), actors.get(i).getCenterX(), getCenterY(), actors.get(i).getCenterY()) <= range)
+				retList.add(actors.get(i));
+		return retList;
+	}
+	public final void turnTowards(float x, float y)
+	{
+		if(x == _x && y == _y)
+			return;
+		_rotation = degrees(atan((x - getCenterX()) / (y - getCenterY())));
+	}
+	public final void turnTowards(Actor obj)
+	{
+		if(obj == this || (obj.getCenterX() == getCenterX() && obj.getCenterY() == getCenterY()))
+			return;
+		_rotation = degrees(atan((obj.getCenterX() - getCenterX()) / (obj.getCenterY() - getCenterY())));
 	}
 	
 	//Base Methods
