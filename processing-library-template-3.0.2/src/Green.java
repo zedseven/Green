@@ -20,7 +20,7 @@ public class Green
 	
 	private static World _currentWorld;
 	
-	private final static String VERSION = "a0.1.0";
+	private final static String VERSION = "0.1.0";
 	
 	//Constructors
 	public Green(PApplet theParent)

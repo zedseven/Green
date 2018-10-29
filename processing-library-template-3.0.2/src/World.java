@@ -98,8 +98,10 @@ public abstract class World
 	public final void handleDraw()
 	{
 		app.background(_backgroundColor);
+		app.pushMatrix();
 		for(int i = 0; i < actors.size(); i++)
 			actors.get(i).draw();
+		app.popMatrix();
 	}
 	public final void handleAct()
 	{

@@ -56,14 +56,6 @@ public abstract class Actor
 	{
 		return _y;
 	}
-	public final float getCenterX()
-	{
-		return _x + _width / 2f;
-	}
-	public final float getCenterY()
-	{
-		return _y + _height / 2f;
-	}
 	public final float getRotation()
 	{
 		return _rotation;
@@ -149,7 +141,7 @@ public abstract class Actor
 	public final boolean isAtEdge()
 	{
 		World world = Green.getWorld();
-		return (getCenterX() < 0 || getCenterX() > world.getWidth() || getCenterY() < 0 || getCenterY() > world.getHeight());
+		return (_x < 0 || _x > world.getWidth() || _y < 0 || _y > world.getHeight());
 	}
 	public final Actor getOneIntersectingObject(Class type) //Compares rects of images
 	{
@@ -173,35 +165,45 @@ public abstract class Actor
 		List<Actor> actors = Green.getWorld().getObjects(type);
 		List<Actor> retList = new ArrayList<Actor>();
 		for(int i = 0; i < actors.size(); i++)
-			if(Green.getPointsDist(getCenterX(), actors.get(i).getCenterX(), getCenterY(), actors.get(i).getCenterY()) <= range)
+			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
 				retList.add(actors.get(i));
 		return retList;
+	}
+	public final Actor getOneObjectInRange(float range, Class type)
+	{
+		List<Actor> actors = Green.getWorld().getObjects(type);
+		List<Actor> retList = new ArrayList<Actor>();
+		for(int i = 0; i < actors.size(); i++)
+			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
+				return actors.get(i);
+		return null;
 	}
 	public final void turnTowards(float x, float y)
 	{
 		if(x == _x && y == _y)
 			return;
-		_rotation = degrees(atan((x - getCenterX()) / (y - getCenterY())));
+		_rotation = degrees(atan((x - _x) / (y - _y)));
 	}
 	public final void turnTowards(Actor obj)
 	{
-		if(obj == this || (obj.getCenterX() == getCenterX() && obj.getCenterY() == getCenterY()))
+		if(obj == this || (obj.getX() == _x && obj.getY() == _y)) //Because it is impossible to turn towards where you already are
 			return;
-		_rotation = degrees(atan((obj.getCenterX() - getCenterX()) / (obj.getCenterY() - getCenterY())));
+		_rotation = degrees(atan((obj.getX() - _x) / (obj.getY() - _y)));
 	}
 	
 	//Base Methods
-	public final void draw()
+	public void draw() //Overridable
 	{
-		app.pushMatrix();
 		app.smooth();
-		//app.translate(width / 2, height / 2);
-		app.translate(_x + _width / 2, _y + _height / 2);
-		app.rotate(radians(_rotation));
-		app.translate(-_x - _width / 2, -_y - _height / 2);
 		app.tint(255, _transparency);
-		app.image(_image, _x, _y, _width, _height);
-		app.popMatrix();
+		//app.translate(width / 2, height / 2);
+		//app.translate(_x + _width / 2, _y + _height / 2);
+		//app.translate(_x + _width / 2, _y + _height / 2);
+		app.translate(_x, _y);
+		app.rotate(radians(_rotation));
+		app.translate(-_width / 2, -_height / 2);
+		app.image(_image, 0, 0, _width, _height);
+		//app.translate(-_x + _width / 2, -_y + _height / 2);
 	}
 	
 	public abstract void act();
