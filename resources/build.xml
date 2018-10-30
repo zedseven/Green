@@ -29,11 +29,11 @@
 	
 	
 	<!-- set the OS properties -->
-	<condition property="is.mac">
-        <os family="mac" />
-	</condition>
 	<condition property="is.windows">
         <os family="windows" />
+	</condition>
+	<condition property="is.mac">
+        <os family="mac" />
 	</condition>
 	<condition property="is.unix">
         <os family="unix" />

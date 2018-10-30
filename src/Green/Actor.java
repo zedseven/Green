@@ -143,7 +143,7 @@ public abstract class Actor
 		World world = Green.getWorld();
 		return (_x < 0 || _x > world.getWidth() || _y < 0 || _y > world.getHeight());
 	}
-	public final Actor getOneIntersectingObject(Class type) //Compares rects of images
+	public final Actor getOneIntersectingObject(Class<?> type) //Compares rects of images
 	{
 		//Coords system is down-right +
 		//TODO: Add in rotation support
@@ -152,15 +152,15 @@ public abstract class Actor
 		{
 			if(actor == this)
 				continue;
-			if(((actor.getX() > _x && actor.getX() < _x + _width) || (actor.getX() + actor.getWidth() > _x && actor.getX() + actor.getWidth() < _x + _width)) &&
-					((actor.getY() > _y && actor.getY() < _y + _height) || (actor.getY() + actor.getHeight() > _y && actor.getY() + actor.getHeight() < _y + _height)))
+			if(((actor.getX() >= _x && actor.getX() <= _x + _width) || (actor.getX() + actor.getWidth() >= _x && actor.getX() + actor.getWidth() <= _x + _width)) &&
+					((actor.getY() >= _y && actor.getY() <= _y + _height) || (actor.getY() + actor.getHeight() >= _y && actor.getY() + actor.getHeight() <= _y + _height)))
 			{
 				return actor;
 			}
 		}
 		return null;
 	}
-	public final List<Actor> getObjectsInRange(float range, Class type)
+	public final List<Actor> getObjectsInRange(float range, Class<?> type)
 	{
 		List<Actor> actors = Green.getWorld().getObjects(type);
 		List<Actor> retList = new ArrayList<Actor>();
@@ -169,10 +169,9 @@ public abstract class Actor
 				retList.add(actors.get(i));
 		return retList;
 	}
-	public final Actor getOneObjectInRange(float range, Class type)
+	public final Actor getOneObjectInRange(float range, Class<?> type)
 	{
 		List<Actor> actors = Green.getWorld().getObjects(type);
-		List<Actor> retList = new ArrayList<Actor>();
 		for(int i = 0; i < actors.size(); i++)
 			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
 				return actors.get(i);

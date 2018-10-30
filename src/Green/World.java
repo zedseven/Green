@@ -53,7 +53,7 @@ public abstract class World
 	{
 		return actors;
 	}
-	public final List<Actor> getObjects(Class type)
+	public final List<Actor> getObjects(Class<?> type)
 	{
 		List<Actor> retList = new ArrayList<Actor>();
 		for(int i = 0; i < actors.size(); i++)
@@ -61,7 +61,7 @@ public abstract class World
 				retList.add(actors.get(i));
 		return retList;
 	}
-	public final Actor getRandomObject(Class type)
+	public final Actor getRandomObject(Class<?> type)
 	{
 		List<Actor> actorList = getObjects(type);
 		if(actorList.size() <= 0)
@@ -98,10 +98,12 @@ public abstract class World
 	public final void handleDraw()
 	{
 		app.background(_backgroundColor);
-		app.pushMatrix();
 		for(int i = 0; i < actors.size(); i++)
+		{
+			app.pushMatrix();
 			actors.get(i).draw();
-		app.popMatrix();
+			app.popMatrix();
+		}
 	}
 	public final void handleAct()
 	{
