@@ -101,6 +101,7 @@ public abstract class World
 		for(int i = 0; i < actors.size(); i++)
 		{
 			app.pushMatrix();
+			app.translate(actors.get(i).getX(), actors.get(i).getY());
 			actors.get(i).draw();
 			app.popMatrix();
 		}

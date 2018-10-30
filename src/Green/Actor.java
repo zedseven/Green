@@ -5,7 +5,7 @@ import processing.core.*;
 
 import static processing.core.PApplet.sin;
 import static processing.core.PApplet.cos;
-import static processing.core.PApplet.atan;
+import static processing.core.PApplet.atan2;
 import static processing.core.PApplet.degrees;
 import static processing.core.PApplet.radians;
 
@@ -17,7 +17,7 @@ public abstract class Actor
 	private float _x = 0;
 	private float _y = 0;
 	private float _rotation = 0;
-	private PImage _image;
+	private PImage _image = null;
 	private float _width;
 	private float _height;
 	private float _transparency = 255;
@@ -30,6 +30,14 @@ public abstract class Actor
 		_image = image;
 		_width = _image.width;
 		_height = _image.height;
+		init();
+	}
+	public Actor(float x, float y, float w, float h)
+	{
+		_x = x;
+		_y = y;
+		_width = w;
+		_height = h;
 		init();
 	}
 	public Actor(float x, float y, PImage image, float w, float h)
@@ -80,6 +88,14 @@ public abstract class Actor
 	{
 		return Green.getWorld();
 	}
+	public static <W extends World> W getWorldOfType(Class<W> type)
+	{
+		//ClassCastException
+		if(type.isInstance(Green.getWorld()))
+			return (W) Green.getWorld();
+		else
+			throw new ClassCastException("The current world is not of the type specified.");
+	}
 	
 	//Setters
 	public final void setX(float x)
@@ -122,6 +138,10 @@ public abstract class Actor
 	}
 	
 	//General Methods
+	/**
+	 * Moves {@code amount} units in the direction of the actor's rotation.
+	 * @param amount Number of units to move.
+	 */
 	public final void move(float amount)
 	{
 		_x += cos(radians(_rotation)) * amount;
@@ -143,12 +163,12 @@ public abstract class Actor
 		World world = Green.getWorld();
 		return (_x < 0 || _x > world.getWidth() || _y < 0 || _y > world.getHeight());
 	}
-	public final Actor getOneIntersectingObject(Class<?> type) //Compares rects of images
+	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) //Compares rects of images
 	{
 		//Coords system is down-right +
 		//TODO: Add in rotation support
-		List<Actor> actors = Green.getWorld().getObjects(type);
-		for(Actor actor : actors)
+		List<A> actors = (List<A>) Green.getWorld().getObjects(type);
+		for(A actor : actors)
 		{
 			if(actor == this)
 				continue;
@@ -160,49 +180,65 @@ public abstract class Actor
 		}
 		return null;
 	}
-	public final List<Actor> getObjectsInRange(float range, Class<?> type)
+	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type)
 	{
 		List<Actor> actors = Green.getWorld().getObjects(type);
-		List<Actor> retList = new ArrayList<Actor>();
+		List<A> retList = new ArrayList<A>();
+		float tX = getX() + oX;
+		float tY = getY() + oY;
 		for(int i = 0; i < actors.size(); i++)
-			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
-				retList.add(actors.get(i));
+			if(Green.getPointsDist(tX, actors.get(i).getX(), tY, actors.get(i).getY()) <= 1f /*CHANGE HERE LATER*/)
+				retList.add((A) actors.get(i));
 		return retList;
 	}
-	public final Actor getOneObjectInRange(float range, Class<?> type)
+	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type)
+	{
+		List<Actor> actors = Green.getWorld().getObjects(type);
+		float tX = getX() + oX;
+		float tY = getY() + oY;
+		for(int i = 0; i < actors.size(); i++)
+			if(Green.getPointsDist(tX, actors.get(i).getX(), tY, actors.get(i).getY()) <= 1f /*CHANGE HERE LATER*/)
+				return (A) actors.get(i);
+		return null;
+	}
+	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type)
+	{
+		List<Actor> actors = Green.getWorld().getObjects(type);
+		List<A> retList = new ArrayList<A>();
+		for(int i = 0; i < actors.size(); i++)
+			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
+				retList.add((A) actors.get(i));
+		return retList;
+	}
+	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type)
 	{
 		List<Actor> actors = Green.getWorld().getObjects(type);
 		for(int i = 0; i < actors.size(); i++)
 			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
-				return actors.get(i);
+				return (A) actors.get(i);
 		return null;
 	}
 	public final void turnTowards(float x, float y)
 	{
-		if(x == _x && y == _y)
-			return;
-		_rotation = degrees(atan((x - _x) / (y - _y)));
+		if(x == _x && y == _y) return;
+		_rotation = degrees(atan2(y - _y, x - _x));
 	}
 	public final void turnTowards(Actor obj)
 	{
-		if(obj == this || (obj.getX() == _x && obj.getY() == _y)) //Because it is impossible to turn towards where you already are
-			return;
-		_rotation = degrees(atan((obj.getX() - _x) / (obj.getY() - _y)));
+		if(obj == this || (obj.getX() == _x && obj.getY() == _y)) return; //Because it is impossible to turn towards where you already are
+		_rotation = degrees(atan2(obj.getY() - _y, obj.getX() - _x));
 	}
 	
 	//Base Methods
 	public void draw() //Overridable
 	{
+		if(_image == null) return;
 		app.smooth();
 		app.tint(255, _transparency);
-		//app.translate(width / 2, height / 2);
-		//app.translate(_x + _width / 2, _y + _height / 2);
-		//app.translate(_x + _width / 2, _y + _height / 2);
-		app.translate(_x, _y);
+		//app.translate(_x, _y);
 		app.rotate(radians(_rotation));
-		app.translate(-_width / 2, -_height / 2);
+		app.translate(-_width / 2f, -_height / 2f);
 		app.image(_image, 0, 0, _width, _height);
-		//app.translate(-_x + _width / 2, -_y + _height / 2);
 	}
 	
 	public abstract void act();
