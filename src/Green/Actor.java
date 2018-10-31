@@ -240,6 +240,7 @@ public abstract class Actor
 		app.translate(-_width / 2f, -_height / 2f);
 		app.image(_image, 0, 0, _width, _height);
 	}
+	public void addedToWorld(World world) {}
 	
 	public abstract void act();
 }

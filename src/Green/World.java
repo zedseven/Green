@@ -81,6 +81,7 @@ public abstract class World
 	public final void addObject(Actor obj)
 	{
 		actors.add(obj);
+		obj.addedToWorld(this);
 	}
 	public final void removeObject(Actor obj)
 	{
