@@ -16,6 +16,7 @@ public abstract class Actor
 	
 	private float _x = 0;
 	private float _y = 0;
+	private float _z = 0;
 	private float _rotation = 0;
 	private PImage _image = null;
 	private float _width;
@@ -64,6 +65,10 @@ public abstract class Actor
 	{
 		return _y;
 	}
+	public final float getZ()
+	{
+		return _z;
+	}
 	public final float getRotation()
 	{
 		return _rotation;
@@ -84,9 +89,12 @@ public abstract class Actor
 	{
 		return _transparency;
 	}
-	public static World getWorld()
+	public final World getWorld()
 	{
-		return Green.getWorld();
+		World currentWorld = Green.getWorld();
+		if(currentWorld.hasObject(this))
+			return currentWorld;
+		return null;
 	}
 	public static <W extends World> W getWorldOfType(Class<W> type)
 	{
@@ -105,6 +113,10 @@ public abstract class Actor
 	public final void setY(float y)
 	{
 		_y = y;
+	}
+	public final void setZ(float z)
+	{
+		_z = z;
 	}
 	public final void setLocation(float x, float y)
 	{
@@ -167,7 +179,7 @@ public abstract class Actor
 	{
 		//Coords system is down-right +
 		//TODO: Add in rotation support
-		List<A> actors = (List<A>) Green.getWorld().getObjects(type);
+		List<A> actors = (List<A>) getWorld().getObjects(type);
 		for(A actor : actors)
 		{
 			if(actor == this)
@@ -182,7 +194,7 @@ public abstract class Actor
 	}
 	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type)
 	{
-		List<Actor> actors = Green.getWorld().getObjects(type);
+		List<Actor> actors = getWorld().getObjects(type);
 		List<A> retList = new ArrayList<A>();
 		float tX = getX() + oX;
 		float tY = getY() + oY;
@@ -193,7 +205,7 @@ public abstract class Actor
 	}
 	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type)
 	{
-		List<Actor> actors = Green.getWorld().getObjects(type);
+		List<Actor> actors = getWorld().getObjects(type);
 		float tX = getX() + oX;
 		float tY = getY() + oY;
 		for(int i = 0; i < actors.size(); i++)
@@ -203,7 +215,7 @@ public abstract class Actor
 	}
 	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type)
 	{
-		List<Actor> actors = Green.getWorld().getObjects(type);
+		List<Actor> actors = getWorld().getObjects(type);
 		List<A> retList = new ArrayList<A>();
 		for(int i = 0; i < actors.size(); i++)
 			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
@@ -212,7 +224,7 @@ public abstract class Actor
 	}
 	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type)
 	{
-		List<Actor> actors = Green.getWorld().getObjects(type);
+		List<Actor> actors = getWorld().getObjects(type);
 		for(int i = 0; i < actors.size(); i++)
 			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
 				return (A) actors.get(i);

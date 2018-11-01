@@ -95,15 +95,26 @@ public abstract class World
 		}
 	}
 	
+	//Utility Methods
+	public final boolean hasObject(Actor findActor)
+	{
+		List<Actor> actors = getObjects();
+		for(Actor actor : actors)
+			if(actor.equals(findActor))
+				return true;
+		return false;
+	}
+	
 	//Base Methods
 	public final void handleDraw()
 	{
 		app.background(_backgroundColor);
-		for(int i = 0; i < actors.size(); i++)
+		Collections.sort(actors, (a1, a2) -> { return Math.round(a1.getZ() - a2.getZ()); });
+		for(Actor actor : actors)
 		{
 			app.pushMatrix();
-			app.translate(actors.get(i).getX(), actors.get(i).getY());
-			actors.get(i).draw();
+			app.translate(actor.getX(), actor.getY());
+			actor.draw();
 			app.popMatrix();
 		}
 	}
