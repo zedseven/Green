@@ -11,7 +11,8 @@ public abstract class World
 	private int _width;
 	private int _height;
 	
-	private int _backgroundColor;
+	private int _backgroundColor = app.color(255, 255, 255);
+	private PImage _backgroundImage = null;
 	
 	private List<Actor> actors = new ArrayList<Actor>();
 	
@@ -21,13 +22,19 @@ public abstract class World
 		_width = w;
 		_height = h;
 		init();
-		_backgroundColor = app.color(255, 255, 255);
 	}
 	public World(int w, int h, int bgColor)
 	{
 		_width = w;
 		_height = h;
 		_backgroundColor = bgColor;
+		init();
+	}
+	public World(int w, int h, PImage bgImage)
+	{
+		_width = w;
+		_height = h;
+		_backgroundImage = bgImage;
 		init();
 	}
 	private void init()
@@ -109,6 +116,8 @@ public abstract class World
 	public final void handleDraw()
 	{
 		app.background(_backgroundColor);
+		if(_backgroundImage != null)
+			app.image(_backgroundImage, 0, 0, _width, _height);
 		Collections.sort(actors, (a1, a2) -> { return Math.round(a1.getZ() - a2.getZ()); });
 		for(Actor actor : actors)
 		{

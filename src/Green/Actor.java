@@ -175,21 +175,21 @@ public abstract class Actor
 		World world = Green.getWorld();
 		return (_x < 0 || _x > world.getWidth() || _y < 0 || _y > world.getHeight());
 	}
-	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) //Compares rects of images
+	public final boolean intersects(Actor actor)
 	{
 		//Coords system is down-right +
 		//TODO: Add in rotation support
+		if(actor == this)
+			return false;
+		return (((actor.getX() >= _x && actor.getX() <= _x + _width) || (actor.getX() + actor.getWidth() >= _x && actor.getX() + actor.getWidth() <= _x + _width)) &&
+				((actor.getY() >= _y && actor.getY() <= _y + _height) || (actor.getY() + actor.getHeight() >= _y && actor.getY() + actor.getHeight() <= _y + _height)));
+	}
+	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) //Compares rects of images
+	{
 		List<A> actors = (List<A>) getWorld().getObjects(type);
 		for(A actor : actors)
-		{
-			if(actor == this)
-				continue;
-			if(((actor.getX() >= _x && actor.getX() <= _x + _width) || (actor.getX() + actor.getWidth() >= _x && actor.getX() + actor.getWidth() <= _x + _width)) &&
-					((actor.getY() >= _y && actor.getY() <= _y + _height) || (actor.getY() + actor.getHeight() >= _y && actor.getY() + actor.getHeight() <= _y + _height)))
-			{
+			if(intersects(actor))
 				return actor;
-			}
-		}
 		return null;
 	}
 	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type)
@@ -229,6 +229,10 @@ public abstract class Actor
 			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
 				return (A) actors.get(i);
 		return null;
+	}
+	public final <A extends Actor> List<A> getNeighbours(float range, Class<A> type)
+	{
+		return getObjectsInRange(range, type);
 	}
 	public final void turnTowards(float x, float y)
 	{
