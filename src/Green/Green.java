@@ -39,9 +39,35 @@ public class Green
 	{
 		return VERSION;
 	}
+	
+	//Math Methods
 	public static float getPointsDist(float x1, float y1, float x2, float y2)
 	{
 		return (float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
+	}
+	public static boolean getLinesIntersect(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y)
+	{
+		float iX;
+		float iY;
+		
+		float aM = (a2y - a1y) / (a2x - a1x);
+		float aB = a1y - aM * a1x;
+		float bM = (b2y - b1y) / (b2x - b1x);
+		float bB = b1y - bM * b1x;
+		
+		if (a1x == a2x) iX = a1x;
+		else if (b1x == b2x) iX = b1x;
+		else
+		{
+			if (aM == bM) return false;
+
+			iX = (bB - aB) / (aM - bM);
+			//float iY = aM * iX + aB;
+		}
+		iY = !Float.isNaN(aM) && !Float.isInfinite(aM) ? aM * iX + aB : bM * iX + bB;
+		
+		return Math.min(a1x, a2x) <= iX && iX <= Math.max(a1x, a2x) && Math.min(b1x, b2x) <= iX && iX <= Math.max(b1x, b2x) &&
+		       Math.min(a1y, a2y) <= iY && iY <= Math.max(a1y, a2y) && Math.min(b1y, b2y) <= iY && iY <= Math.max(b1y, b2y);
 	}
 	
 	//Static Methods
