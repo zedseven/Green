@@ -2,6 +2,8 @@ package Green;
 
 import java.util.*;
 import processing.core.*;
+import static processing.core.PApplet.floor;
+import static processing.core.PApplet.ceil;
 
 public abstract class World
 {
@@ -11,7 +13,7 @@ public abstract class World
 	private int _width;
 	private int _height;
 	
-	private int _backgroundColor = app.color(255, 255, 255);
+	private int _backgroundColour = -1;//app.color(255, 255, 255);
 	private PImage _backgroundImage = null;
 	
 	private List<Actor> actors = new ArrayList<Actor>();
@@ -27,7 +29,7 @@ public abstract class World
 	{
 		_width = w;
 		_height = h;
-		_backgroundColor = bgColor;
+		_backgroundColour = bgColor;
 		init();
 	}
 	public World(int w, int h, PImage bgImage)
@@ -54,7 +56,7 @@ public abstract class World
 	}
 	public final int getBackgroundColor()
 	{
-		return _backgroundColor;
+		return _backgroundColour;
 	}
 	public final List<Actor> getObjects()
 	{
@@ -79,11 +81,11 @@ public abstract class World
 	//Setters
 	public final void setBackgroundColor(int newColor)
 	{
-		_backgroundColor = newColor;
+		_backgroundColour = newColor;
 	}
 	public final void setBackgroundColor(int newColorR, int newColorG, int newColorB)
 	{
-		_backgroundColor = app.color(newColorR, newColorG, newColorB);
+		_backgroundColour = app.color(newColorR, newColorG, newColorB);
 	}
 	public final void addObject(Actor obj)
 	{
@@ -115,7 +117,11 @@ public abstract class World
 	//Base Methods
 	public final void handleDraw()
 	{
-		app.background(_backgroundColor);
+		app.background(-16777216);
+		app.fill(_backgroundColour);
+		app.translate(floor(app.width / 2f - _width / 2f) - 1, floor(app.height / 2f - _height / 2f) - 1);
+		app.rect(0, 0, _width + 1, _height + 1);
+		app.fill(-16777216); //app.color(0, 0, 0)
 		if(_backgroundImage != null)
 			app.image(_backgroundImage, 0, 0, _width, _height);
 		Collections.sort(actors, (a1, a2) -> { return Math.round(a1.getZ() - a2.getZ()); });
@@ -130,8 +136,8 @@ public abstract class World
 	public final void handleAct()
 	{
 		act();
-		for(int i = 0; i < actors.size(); i++)
-			actors.get(i).act();
+		for(Actor actor : actors)
+			actor.act();
 	}
 	
 	public abstract void prepare();

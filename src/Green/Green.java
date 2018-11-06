@@ -46,7 +46,7 @@ public class Green
 		return (float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
 	}
 	public static boolean getLinesIntersect(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y)
-	{
+	{		
 		float iX;
 		float iY;
 		
@@ -94,6 +94,7 @@ public class Green
 	public void loadWorld(World world)
 	{
 		_currentWorld = world;
+		//parent.setSize(world.getWidth(), world.getHeight());
 		world.prepare();
 	}
 }

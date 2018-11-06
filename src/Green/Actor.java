@@ -178,11 +178,57 @@ public abstract class Actor
 	public final boolean intersects(Actor actor)
 	{
 		//Coords system is down-right +
-		//TODO: Add in rotation support
 		if(actor == this)
 			return false;
-		return (((actor.getX() >= _x && actor.getX() <= _x + _width) || (actor.getX() + actor.getWidth() >= _x && actor.getX() + actor.getWidth() <= _x + _width)) &&
-				((actor.getY() >= _y && actor.getY() <= _y + _height) || (actor.getY() + actor.getHeight() >= _y && actor.getY() + actor.getHeight() <= _y + _height)));
+		
+		float rot1Sin = sin(radians(_rotation));
+		float rot1Cos = cos(radians(_rotation));
+		float edge1X = _width / 2f;
+		float edge1Y = _height / 2f;
+		float rot2Sin = sin(radians(actor.getRotation()));
+		float rot2Cos = cos(radians(actor.getRotation()));
+		float edge2X = actor.getWidth() / 2f;
+		float edge2Y = actor.getHeight() / 2f;
+		
+		float c1RDX = (edge1X * rot1Cos - edge1Y * rot1Sin) + _x;
+		float c1RDY = (edge1X * rot1Sin + edge1Y * rot1Cos) + _y;
+		float c1LDX = (-edge1X * rot1Cos - edge1Y * rot1Sin) + _x;
+		float c1LDY = (-edge1X * rot1Sin + edge1Y * rot1Cos) + _y;
+		float c1RUX = (edge1X * rot1Cos + edge1Y * rot1Sin) + _x;
+		float c1RUY = (edge1X * rot1Sin - edge1Y * rot1Cos) + _y;
+		float c1LUX = (-edge1X * rot1Cos + edge1Y * rot1Sin) + _x;
+		float c1LUY = (-edge1X * rot1Sin - edge1Y * rot1Cos) + _y;
+		
+		float c2RDX = (edge2X * rot2Cos - edge2Y * rot2Sin) + actor.getX();
+		float c2RDY = (edge2X * rot2Sin + edge2Y * rot2Cos) + actor.getY();
+		float c2LDX = (-edge2X * rot2Cos - edge2Y * rot2Sin) + actor.getX();
+		float c2LDY = (-edge2X * rot2Sin + edge2Y * rot2Cos) + actor.getY();
+		float c2RUX = (edge2X * rot2Cos + edge2Y * rot2Sin) + actor.getX();
+		float c2RUY = (edge2X * rot2Sin - edge2Y * rot2Cos) + actor.getY();
+		float c2LUX = (-edge2X * rot2Cos + edge2Y * rot2Sin) + actor.getX();
+		float c2LUY = (-edge2X * rot2Sin - edge2Y * rot2Cos) + actor.getY();
+		
+		return (
+				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2LDX, c2LDY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2LDX, c2LDY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2LDX, c2LDY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2LDX, c2LDY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2RDX, c2RDY, c2LDX, c2LDY) || 
+				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RDX, c2RDY, c2LDX, c2LDY) || 
+				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RDX, c2RDY, c2LDX, c2LDY) || 
+				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RDX, c2RDY, c2LDX, c2LDY) || 
+				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2LUX, c2LUY, c2RDX, c2RDY) || 
+				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2LUX, c2LUY, c2RDX, c2RDY) || 
+				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2LUX, c2LUY, c2RDX, c2RDY) || 
+				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2LUX, c2LUY, c2RDX, c2RDY) || 
+				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c1RUX, c2RUY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c1RUX, c2RUY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c1RUX, c2RUY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c1RUX, c2RUY, c2LUX, c2LUY)
+				);
+		
+		/*return (((actor.getX() >= _x && actor.getX() <= _x + _width) || (actor.getX() + actor.getWidth() >= _x && actor.getX() + actor.getWidth() <= _x + _width)) &&
+				((actor.getY() >= _y && actor.getY() <= _y + _height) || (actor.getY() + actor.getHeight() >= _y && actor.getY() + actor.getHeight() <= _y + _height)));*/
 	}
 	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) //Compares rects of images
 	{
@@ -198,9 +244,9 @@ public abstract class Actor
 		List<A> retList = new ArrayList<A>();
 		float tX = getX() + oX;
 		float tY = getY() + oY;
-		for(int i = 0; i < actors.size(); i++)
-			if(Green.getPointsDist(tX, actors.get(i).getX(), tY, actors.get(i).getY()) <= 1f /*CHANGE HERE LATER*/)
-				retList.add((A) actors.get(i));
+		for(Actor actor : actors)
+			if(Green.getPointsDist(tX, actor.getX(), tY, actor.getY()) <= 1f /*CHANGE HERE LATER*/)
+				retList.add((A) actor);
 		return retList;
 	}
 	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type)
@@ -208,26 +254,26 @@ public abstract class Actor
 		List<Actor> actors = getWorld().getObjects(type);
 		float tX = getX() + oX;
 		float tY = getY() + oY;
-		for(int i = 0; i < actors.size(); i++)
-			if(Green.getPointsDist(tX, actors.get(i).getX(), tY, actors.get(i).getY()) <= 1f /*CHANGE HERE LATER*/)
-				return (A) actors.get(i);
+		for(Actor actor : actors)
+			if(Green.getPointsDist(tX, actor.getX(), tY, actor.getY()) <= 1f /*CHANGE HERE LATER*/)
+				return (A) actor;
 		return null;
 	}
 	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type)
 	{
 		List<Actor> actors = getWorld().getObjects(type);
 		List<A> retList = new ArrayList<A>();
-		for(int i = 0; i < actors.size(); i++)
-			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
-				retList.add((A) actors.get(i));
+		for(Actor actor : actors)
+			if(Green.getPointsDist(_x, actor.getX(), _y, actor.getY()) <= range)
+				retList.add((A) actor);
 		return retList;
 	}
 	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type)
 	{
 		List<Actor> actors = getWorld().getObjects(type);
-		for(int i = 0; i < actors.size(); i++)
-			if(Green.getPointsDist(_x, actors.get(i).getX(), _y, actors.get(i).getY()) <= range)
-				return (A) actors.get(i);
+		for(Actor actor : actors)
+			if(Green.getPointsDist(_x, actor.getX(), _y, actor.getY()) <= range)
+				return (A) actor;
 		return null;
 	}
 	public final <A extends Actor> List<A> getNeighbours(float range, Class<A> type)
