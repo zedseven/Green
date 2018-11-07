@@ -303,6 +303,7 @@ public abstract class Actor
 		app.image(_image, 0, 0, _width, _height);
 	}
 	public void addedToWorld(World world) {}
+	public void removedFromWorld(World world) {}
 	
-	public abstract void act();
+	public abstract void act(float deltaTime);
 }

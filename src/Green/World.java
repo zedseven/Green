@@ -18,6 +18,8 @@ public abstract class World
 	
 	private List<Actor> actors = new ArrayList<Actor>();
 	
+	private long _lastMillis = 0;
+	
 	//Constructors
 	public World(int w, int h)
 	{
@@ -97,6 +99,7 @@ public abstract class World
 		try
 		{
 			actors.remove(obj);
+			obj.removedFromWorld(this);
 		}
 		catch(Exception e)
 		{
@@ -135,11 +138,14 @@ public abstract class World
 	}
 	public final void handleAct()
 	{
-		act();
+		long currentMillis = app.millis();
+		float deltaTime = (currentMillis - _lastMillis) / 1000f;
+		_lastMillis = currentMillis;
+		act(deltaTime);
 		for(Actor actor : actors)
-			actor.act();
+			actor.act(deltaTime);
 	}
 	
 	public abstract void prepare();
-	public abstract void act();
+	public abstract void act(float deltaTime);
 }
