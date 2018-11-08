@@ -108,11 +108,19 @@ public abstract class Actor
 	//Setters
 	public final void setX(float x)
 	{
-		_x = x;
+		World world = getWorld();
+		if(!world.getUnbounded())
+			_x = Math.max(0, Math.min(world.getWidth(), x));
+		else
+			_x = x;
 	}
 	public final void setY(float y)
 	{
-		_y = y;
+		World world = getWorld();
+		if(!world.getUnbounded())
+			_y = Math.max(0, Math.min(world.getHeight(), y));
+		else
+			_y = y;
 	}
 	public final void setZ(float z)
 	{
@@ -120,8 +128,17 @@ public abstract class Actor
 	}
 	public final void setLocation(float x, float y)
 	{
-		_x = x;
-		_y = y;
+		World world = getWorld();
+		if(!world.getUnbounded())
+		{
+			_x = Math.max(0, Math.min(world.getWidth(), x));
+			_y = Math.max(0, Math.min(world.getHeight(), y));
+		}
+		else
+		{
+			_x = x;
+			_y = y;
+		}
 	}
 	public final void setRotation(float rotation)
 	{
@@ -156,13 +173,11 @@ public abstract class Actor
 	 */
 	public final void move(float amount)
 	{
-		_x += cos(radians(_rotation)) * amount;
-		_y += sin(radians(_rotation)) * amount;
+		setLocation(_x + cos(radians(_rotation)) * amount, _y + sin(radians(_rotation)) * amount);
 	}
 	public final void moveGlobal(float x, float y)
 	{
-		_x += x;
-		_y += y;
+		setLocation(_x + x, _y + y);
 	}
 	public final void turn(float degrees)
 	{
@@ -173,7 +188,7 @@ public abstract class Actor
 	public final boolean isAtEdge()
 	{
 		World world = Green.getWorld();
-		return (_x < 0 || _x > world.getWidth() || _y < 0 || _y > world.getHeight());
+		return (_x <= 0 || _x >= world.getWidth() || _y <= 0 || _y >= world.getHeight());
 	}
 	public final boolean intersects(Actor actor)
 	{
@@ -225,7 +240,7 @@ public abstract class Actor
 				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c1RUX, c2RUY, c2LUX, c2LUY) || 
 				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c1RUX, c2RUY, c2LUX, c2LUY) || 
 				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c1RUX, c2RUY, c2LUX, c2LUY)
-				);
+			);
 		
 		/*return (((actor.getX() >= _x && actor.getX() <= _x + _width) || (actor.getX() + actor.getWidth() >= _x && actor.getX() + actor.getWidth() <= _x + _width)) &&
 				((actor.getY() >= _y && actor.getY() <= _y + _height) || (actor.getY() + actor.getHeight() >= _y && actor.getY() + actor.getHeight() <= _y + _height)));*/

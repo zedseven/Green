@@ -15,6 +15,7 @@ public abstract class World
 	
 	private int _backgroundColour = -1;//app.color(255, 255, 255);
 	private PImage _backgroundImage = null;
+	private boolean _unbounded = false;
 	
 	private List<Actor> actors = new ArrayList<Actor>();
 	
@@ -41,6 +42,29 @@ public abstract class World
 		_backgroundImage = bgImage;
 		init();
 	}
+	public World(int w, int h, boolean unbounded)
+	{
+		_width = w;
+		_height = h;
+		_unbounded = unbounded;
+		init();
+	}
+	public World(int w, int h, int bgColor, boolean unbounded)
+	{
+		_width = w;
+		_height = h;
+		_backgroundColour = bgColor;
+		_unbounded = unbounded;
+		init();
+	}
+	public World(int w, int h, PImage bgImage, boolean unbounded)
+	{
+		_width = w;
+		_height = h;
+		_backgroundImage = bgImage;
+		_unbounded = unbounded;
+		init();
+	}
 	private void init()
 	{
 		green = Green.getInstance();
@@ -59,6 +83,10 @@ public abstract class World
 	public final int getBackgroundColor()
 	{
 		return _backgroundColour;
+	}
+	public final boolean getUnbounded()
+	{
+		return _unbounded;
 	}
 	public final List<Actor> getObjects()
 	{
@@ -88,6 +116,12 @@ public abstract class World
 	public final void setBackgroundColor(int newColorR, int newColorG, int newColorB)
 	{
 		_backgroundColour = app.color(newColorR, newColorG, newColorB);
+	}
+	public final void setUnbounded(boolean unbounded)
+	{
+		_unbounded = unbounded;
+		for(Actor actor : actors)
+			actor.setLocation(actor.getX(), actor.getY());
 	}
 	public final void addObject(Actor obj)
 	{
