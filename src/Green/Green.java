@@ -43,7 +43,7 @@ public class Green
 	//Math Methods
 	public static float getPointsDist(float x1, float y1, float x2, float y2)
 	{
-		return (float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
+		return (float) Math.hypot(x2 - x1, y2 - y1);
 	}
 	public static boolean getLinesIntersect(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y)
 	{
