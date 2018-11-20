@@ -13,6 +13,7 @@ public abstract class Actor
 {
 	private Green green;
 	private PApplet app;
+	private UUID uuid = UUID.randomUUID();
 	
 	private float _x = 0;
 	private float _y = 0;
@@ -55,8 +56,16 @@ public abstract class Actor
 		green = Green.getInstance();
 		app = green.getParent();
 	}
+	public String toString()
+	{
+		return "Actor \"" + this.getClass().getSimpleName() + "\" #" + uuid + " (" + _x + ", " + _y + ")";
+	}
 	
 	//Getters
+	public final UUID getUuid()
+	{
+		return uuid;
+	}
 	public final float getX()
 	{
 		return _x;
@@ -255,40 +264,40 @@ public abstract class Actor
 	}
 	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type)
 	{
-		List<Actor> actors = getWorld().getObjects(type);
+		List<A> actors = getWorld().getObjects(type);
 		List<A> retList = new ArrayList<A>();
 		float tX = getX() + oX;
 		float tY = getY() + oY;
-		for(Actor actor : actors)
-			if(Green.getPointsDist(tX, actor.getX(), tY, actor.getY()) <= 1f /*CHANGE HERE LATER*/)
-				retList.add((A) actor);
+		for(A actor : actors)
+			if(Green.getPointsDist(tX, tY, actor.getX(), actor.getY()) <= 1f /*CHANGE HERE LATER*/)
+				retList.add(actor);
 		return retList;
 	}
 	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type)
 	{
-		List<Actor> actors = getWorld().getObjects(type);
+		List<A> actors = getWorld().getObjects(type);
 		float tX = getX() + oX;
 		float tY = getY() + oY;
-		for(Actor actor : actors)
-			if(Green.getPointsDist(tX, actor.getX(), tY, actor.getY()) <= 1f /*CHANGE HERE LATER*/)
-				return (A) actor;
+		for(A actor : actors)
+			if(Green.getPointsDist(tX, tY, actor.getX(), actor.getY()) <= 1f /*CHANGE HERE LATER*/)
+				return actor;
 		return null;
 	}
 	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type)
 	{
-		List<Actor> actors = getWorld().getObjects(type);
+		List<A> actors = getWorld().getObjects(type);
 		List<A> retList = new ArrayList<A>();
-		for(Actor actor : actors)
-			if(Green.getPointsDist(_x, actor.getX(), _y, actor.getY()) <= range)
-				retList.add((A) actor);
+		for(A actor : actors)
+			if(Green.getPointsDist(_x, _y, actor.getX(), actor.getY()) <= range)
+				retList.add(actor);
 		return retList;
 	}
 	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type)
 	{
-		List<Actor> actors = getWorld().getObjects(type);
-		for(Actor actor : actors)
-			if(Green.getPointsDist(_x, actor.getX(), _y, actor.getY()) <= range)
-				return (A) actor;
+		List<A> actors = getWorld().getObjects(type);
+		for(A actor : actors)
+			if(Green.getPointsDist(_x, _y, actor.getX(), actor.getY()) <= range)
+				return actor;
 		return null;
 	}
 	public final <A extends Actor> List<A> getNeighbours(float range, Class<A> type)

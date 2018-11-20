@@ -9,6 +9,7 @@ public abstract class World
 {
 	private Green green;
 	private PApplet app;
+	private UUID uuid = UUID.randomUUID();
 	
 	private int _width;
 	private int _height;
@@ -90,8 +91,16 @@ public abstract class World
 		green = Green.getInstance();
 		app = green.getParent();
 	}
+	public String toString()
+	{
+		return "World \"" + this.getClass().getSimpleName() + "\" #" + uuid + " (" + _width + ", " + _height + ")";
+	}
 	
 	//Getters
+	public final UUID getUuid()
+	{
+		return uuid;
+	}
 	public final int getWidth()
 	{
 		return _width;
@@ -124,17 +133,17 @@ public abstract class World
 	{
 		return _actors;
 	}
-	public final List<Actor> getObjects(Class<?> type)
+	public final <A extends Actor> List<A> getObjects(Class<A> type)
 	{
-		List<Actor> retList = new ArrayList<Actor>();
+		List<A> retList = new ArrayList<A>();
 		for(int i = 0; i < _actors.size(); i++)
 			if(type.isInstance(_actors.get(i)))
-				retList.add(_actors.get(i));
+				retList.add((A) _actors.get(i));
 		return retList;
 	}
-	public final Actor getRandomObject(Class<?> type)
+	public final <A extends Actor> A getRandomObject(Class<A> type)
 	{
-		List<Actor> actorList = getObjects(type);
+		List<A> actorList = getObjects(type);
 		if(actorList.size() <= 0)
 			return null;
 		return actorList.get((int) Math.floor(Math.random() * actorList.size()));
