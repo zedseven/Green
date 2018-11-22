@@ -22,7 +22,7 @@ public abstract class Actor
 	private PImage _image = null;
 	private float _width;
 	private float _height;
-	private float _transparency = 255;
+	private float _opacity = 255;
 	
 	//Constructors
 	public Actor(float x, float y, PImage image) //TODO: Add GIF support
@@ -51,6 +51,15 @@ public abstract class Actor
 		_height = h;
 		init();
 	}
+	public Actor(float x, float y, PImage image, float scaleMultiplier)
+	{
+		_x = x;
+		_y = y;
+		_image = image;
+		_width = _image.width * scaleMultiplier;
+		_height = _image.height * scaleMultiplier;
+		init();
+	}
 	private void init()
 	{
 		green = Green.getInstance();
@@ -58,87 +67,158 @@ public abstract class Actor
 	}
 	public String toString()
 	{
-		return "Actor \"" + this.getClass().getSimpleName() + "\" #" + uuid + " (" + _x + ", " + _y + ")";
+		return "Actor \"" + this.getClass().getSimpleName() + "\" #" + uuid;
 	}
 	
 	//Getters
+	/**
+	 * Retrieves the {@link java.util.UUID} of the {@link Actor}. This value is unique to each {@link Actor} instance, and cannot be modified.
+	 * @return The unique instance ID.
+	 */
 	public final UUID getUuid()
 	{
 		return uuid;
 	}
+	/**
+	 * Retrieves the X-axis position of the {@link Actor}.
+	 * @return The X-axis position.
+	 */
 	public final float getX()
 	{
 		return _x;
 	}
+	/**
+	 * Retrieves the X-axis position of the {@link Actor}.
+	 * @return The Y-axis position.
+	 */
 	public final float getY()
 	{
 		return _y;
 	}
+	/**
+	 * Retrieves the Z-axis position of the {@link Actor}. This is only used to determine render order.
+	 * @return The Z-axis position.
+	 */
 	public final float getZ()
 	{
 		return _z;
 	}
+	/**
+	 * Retrieves the rotation value (in degrees) of the {@link Actor}.
+	 * @return The rotation in degrees.
+	 */
 	public final float getRotation()
 	{
 		return _rotation;
 	}
+	/**
+	 * Retrieves the width of the {@link Actor}.
+	 * @return The width.
+	 */
 	public final float getWidth()
 	{
 		return _width;
 	}
+	/**
+	 * Retrieves the height of the {@link Actor}.
+	 * @return The height.
+	 */
 	public final float getHeight()
 	{
 		return _height;
 	}
+	/**
+	 * Retrieves the {@link processing.core.PImage} associated with the {@link Actor}.
+	 * @return The associated image.
+	 */
 	public final PImage getImage()
 	{
 		return _image;
 	}
-	public final float getTransparency()
+	/**
+	 * Retrieves the opacity value (in the range 0 - 255) of the {@link Actor}.
+	 * @return The opacity value in range 0 - 255.
+	 */
+	public final float getOpacity()
 	{
-		return _transparency;
+		return _opacity;
 	}
-	public final World getWorld()
+	/**
+	 * Retrieves the current {@link World} this {@link Actor} is in, or {@link null} otherwise.
+	 * @return The world this {@link Actor} is a part of that is currently loaded.
+	 * @throws NoWorldException Thrown when the method is called when the {@link Actor} is not part of a {@link World}.
+	 */
+	public final World getWorld() throws NoWorldException
+	{
+		World currentWorld = Green.getWorld();
+		if(currentWorld.hasObject(this))
+			return currentWorld;
+		throw new NoWorldException();
+	}
+	private final World getWorldSafe()
 	{
 		World currentWorld = Green.getWorld();
 		if(currentWorld.hasObject(this))
 			return currentWorld;
 		return null;
 	}
+	/**
+	 * Retrieves the current {@link World} this {@link Actor} is in as {@code type} if possible, or {@link null} otherwise.
+	 * @param <W> The type of {@link World} to return if possible, as defined by {@code type}.
+	 * @param type The type of {@link World} to return if possible.
+	 * @return The world this {@link Actor} is a part of that is currently loaded.
+	 */
 	public static <W extends World> W getWorldOfType(Class<W> type)
 	{
 		//ClassCastException
 		if(type.isInstance(Green.getWorld()))
 			return (W) Green.getWorld();
 		else
-			throw new ClassCastException("The current world is not of the type specified.");
+			return null; //throw new ClassCastException("The current world is not of the type specified.");
 	}
 	
 	//Setters
+	/**
+	 * Sets the X-axis position of the {@link Actor}.
+	 * @param x The X-axis position to set.
+	 */
 	public final void setX(float x)
 	{
-		World world = getWorld();
-		if(!world.getUnbounded())
+		World world = getWorldSafe();
+		if(world != null && !world.getUnbounded())
 			_x = Math.max(0, Math.min(world.getWidth(), x));
 		else
 			_x = x;
 	}
+	/**
+	 * Sets the Y-axis position of the {@link Actor}.
+	 * @param y The Y-axis position to set.
+	 */
 	public final void setY(float y)
 	{
-		World world = getWorld();
-		if(!world.getUnbounded())
+		World world = getWorldSafe();
+		if(world != null && !world.getUnbounded())
 			_y = Math.max(0, Math.min(world.getHeight(), y));
 		else
 			_y = y;
 	}
+	/**
+	 * Sets the Z-axis position of the {@link Actor}. This is only used to determine render order.
+	 * @param z The Z-axis position to set.
+	 */
 	public final void setZ(float z)
 	{
 		_z = z;
 	}
+	/**
+	 * Sets the X-axis and Y-axis positions of the {@link Actor}.
+	 * @param x The X-axis position to set.
+	 * @param y The Y-axis position to set.
+	 */
 	public final void setLocation(float x, float y)
 	{
-		World world = getWorld();
-		if(!world.getUnbounded())
+		World world = getWorldSafe();
+		if(world != null && !world.getUnbounded())
 		{
 			_x = Math.max(0, Math.min(world.getWidth(), x));
 			_y = Math.max(0, Math.min(world.getHeight(), y));
@@ -149,56 +229,100 @@ public abstract class Actor
 			_y = y;
 		}
 	}
+	/**
+	 * Sets the rotation of the {@link Actor} in degrees.
+	 * @param rotation The rotation value to set in degrees.
+	 */
 	public final void setRotation(float rotation)
 	{
 		_rotation = rotation;
 	}
+	/**
+	 * Sets the width of the {@link Actor}.
+	 * @param w The width value to set.
+	 */
 	public final void setWidth(float w)
 	{
 		_width = w;
 	}
+	/**
+	 * Sets the height of the {@link Actor}.
+	 * @param h The height value to set.
+	 */
 	public final void setHeight(float h)
 	{
 		_height = h;
 	}
+	/**
+	 * Sets the width and height of the {@link Actor}.
+	 * @param w The width value to set.
+	 * @param h The height value to set.
+	 */
 	public final void setDimensions(float w, float h)
 	{
 		_width = w;
 		_height = h;
 	}
+	/**
+	 * Sets the image of the {@link Actor}.
+	 * @param image The {@link processing.core.PImage} to set.
+	 */
 	public final void setImage(PImage image)
 	{
 		_image = image;
 	}
-	public final void setTransparency(float transparency)
+	/**
+	 * Sets the opacity value (in the range 0 - 255) of the {@link Actor}.
+	 * @param opacity The opacity value to set, in range 0 - 255.
+	 */
+	public final void setOpacity(float opacity)
 	{
-		_transparency = transparency;
+		_opacity = opacity;
 	}
 	
 	//General Methods
 	/**
-	 * Moves {@code amount} units in the direction of the actor's rotation.
+	 * Moves the {@link Actor} {@code amount} units in the direction of the actor's rotation.
 	 * @param amount Number of units to move.
 	 */
 	public final void move(float amount)
 	{
 		setLocation(_x + cos(radians(_rotation)) * amount, _y + sin(radians(_rotation)) * amount);
 	}
+	/**
+	 * Moves the {@link Actor} {@code x} units on the X-axis and {@code y} units on the Y-axis.
+	 * @param x Number of units to move in the X-axis.
+	 * @param y Number of units to move in the Y-axis.
+	 */
 	public final void moveGlobal(float x, float y)
 	{
 		setLocation(_x + x, _y + y);
 	}
+	/**
+	 * Rotates the {@link Actor} {@code degrees} amount in degrees.
+	 * @param degrees The amount to turn in degrees.
+	 */
 	public final void turn(float degrees)
 	{
 		_rotation += degrees;
 	}
 	
 	//Utility Functions
-	public final boolean isAtEdge()
+	/**
+	 * Checks to see if the {@link Actor} is at the edge of the {@link World} it is currently in.
+	 * @return Whether the {@link Actor} is at the edge of it's {@link World}, or false if not in one.
+	 * @throws NoWorldException Thrown when the method is called when the {@link Actor} is not part of a {@link World}.
+	 */
+	public final boolean isAtEdge() throws NoWorldException
 	{
-		World world = Green.getWorld();
+		World world = getWorld();
 		return (_x <= 0 || _x >= world.getWidth() || _y <= 0 || _y >= world.getHeight());
 	}
+	/**
+	 * Checks to see whether the {@link Actor} intersects another {@link Actor}, using basic rect comparison.
+	 * @param actor The other {@link Actor} to check against.
+	 * @return Whether or not this {@link Actor} intersects the other, or false if the same {@link Actor} is supplied.
+	 */
 	public final boolean intersects(Actor actor)
 	{
 		//Coords system is down-right +
@@ -250,21 +374,22 @@ public abstract class Actor
 				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c1RUX, c2RUY, c2LUX, c2LUY) || 
 				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c1RUX, c2RUY, c2LUX, c2LUY)
 			);
-		
-		/*return (((actor.getX() >= _x && actor.getX() <= _x + _width) || (actor.getX() + actor.getWidth() >= _x && actor.getX() + actor.getWidth() <= _x + _width)) &&
-				((actor.getY() >= _y && actor.getY() <= _y + _height) || (actor.getY() + actor.getHeight() >= _y && actor.getY() + actor.getHeight() <= _y + _height)));*/
 	}
-	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) //Compares rects of images
+	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) throws NoWorldException //Compares rects of images
 	{
-		List<A> actors = (List<A>) getWorld().getObjects(type);
+		World world = getWorld();
+		List<A> actors = (List<A>) world.getObjects(type);
 		for(A actor : actors)
 			if(intersects(actor))
 				return actor;
 		return null;
 	}
+	//ADD GETINTERSECTINGOBJECTS
 	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type)
 	{
-		List<A> actors = getWorld().getObjects(type);
+		World world = getWorld();
+		if(world == null) return null;
+		List<A> actors = world.getObjects(type);
 		List<A> retList = new ArrayList<A>();
 		float tX = getX() + oX;
 		float tY = getY() + oY;
@@ -275,7 +400,9 @@ public abstract class Actor
 	}
 	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type)
 	{
-		List<A> actors = getWorld().getObjects(type);
+		World world = getWorld();
+		if(world == null) return null;
+		List<A> actors = world.getObjects(type);
 		float tX = getX() + oX;
 		float tY = getY() + oY;
 		for(A actor : actors)
@@ -285,7 +412,9 @@ public abstract class Actor
 	}
 	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type)
 	{
-		List<A> actors = getWorld().getObjects(type);
+		World world = getWorld();
+		if(world == null) return null;
+		List<A> actors = world.getObjects(type);
 		List<A> retList = new ArrayList<A>();
 		for(A actor : actors)
 			if(Green.getPointsDist(_x, _y, actor.getX(), actor.getY()) <= range)
@@ -294,7 +423,9 @@ public abstract class Actor
 	}
 	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type)
 	{
-		List<A> actors = getWorld().getObjects(type);
+		World world = getWorld();
+		if(world == null) return null;
+		List<A> actors = world.getObjects(type);
 		for(A actor : actors)
 			if(Green.getPointsDist(_x, _y, actor.getX(), actor.getY()) <= range)
 				return actor;
@@ -320,7 +451,7 @@ public abstract class Actor
 	{
 		if(_image == null) return;
 		app.smooth();
-		app.tint(255, _transparency);
+		app.tint(255, _opacity);
 		//app.translate(_x, _y);
 		app.rotate(radians(_rotation));
 		app.translate(-_width / 2f, -_height / 2f);
