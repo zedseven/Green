@@ -146,7 +146,7 @@ public abstract class Actor
 	/**
 	 * Retrieves the current {@link World} this {@link Actor} is in, or {@link null} otherwise.
 	 * @return The world this {@link Actor} is a part of that is currently loaded.
-	 * @throws NoWorldException Thrown when the method is called when the {@link Actor} is not part of a {@link World}.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
 	public final World getWorld() throws NoWorldException
 	{
@@ -311,7 +311,7 @@ public abstract class Actor
 	/**
 	 * Checks to see if the {@link Actor} is at the edge of the {@link World} it is currently in.
 	 * @return Whether the {@link Actor} is at the edge of it's {@link World}, or false if not in one.
-	 * @throws NoWorldException Thrown when the method is called when the {@link Actor} is not part of a {@link World}.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
 	public final boolean isAtEdge() throws NoWorldException
 	{
@@ -375,6 +375,30 @@ public abstract class Actor
 				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c1RUX, c2RUY, c2LUX, c2LUY)
 			);
 	}
+	/**
+	 * Retrieves a list of all objects matching {@code type} in the {@link World} that intersect with the {@link Actor}, using basic rect comparison.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param type The type of other {@link Actor} to compare against.
+	 * @return The list of intersecting objects matching {@code type}.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> List<A> getIntersectingObjects(Class<A> type) throws NoWorldException //Compares rects of images
+	{
+		World world = getWorld();
+		List<A> actors = (List<A>) world.getObjects(type);
+		List<A> retList = new ArrayList<A>();
+		for(A actor : actors)
+			if(intersects(actor))
+				retList.add(actor);
+		return retList;
+	}
+	/**
+	 * Retrieves the first object matching {@code type} in the {@link World} that intersects with the {@link Actor}, using basic rect comparison.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param type The type of other {@link Actor} to compare against.
+	 * @return The first intersecting object matching {@code type}.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
 	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) throws NoWorldException //Compares rects of images
 	{
 		World world = getWorld();
@@ -384,8 +408,17 @@ public abstract class Actor
 				return actor;
 		return null;
 	}
-	//ADD GETINTERSECTINGOBJECTS
-	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type)
+	/**
+	 * Retrieves a list of all objects matching {@code type} within {@code range} of an offset.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param oX The X-axis value of the offset.
+	 * @param oY The Y-axis value of the offset.
+	 * @param type The type of {@link Actor} to match.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
+	 * @return A list of all objects in the {@link World} matching {@code type} at ({@code oX}, {@code oY}) from the {@link Actor}'s position.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type, float range) throws NoWorldException
 	{
 		World world = getWorld();
 		if(world == null) return null;
@@ -394,11 +427,34 @@ public abstract class Actor
 		float tX = getX() + oX;
 		float tY = getY() + oY;
 		for(A actor : actors)
-			if(Green.getPointsDist(tX, tY, actor.getX(), actor.getY()) <= 1f /*CHANGE HERE LATER*/)
+			if(Green.getPointsDist(tX, tY, actor.getX(), actor.getY()) <= range)
 				retList.add(actor);
 		return retList;
 	}
-	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type)
+	/**
+	 * Retrieves a list of all objects matching {@code type} within 1 unit of an offset.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param oX The X-axis value of the offset.
+	 * @param oY The Y-axis value of the offset.
+	 * @param type The type of {@link Actor} to match.
+	 * @return A list of all objects in the {@link World} matching {@code type} at ({@code oX}, {@code oY}) from the {@link Actor}'s position.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type) throws NoWorldException
+	{
+		return getObjectsAtOffset(oX, oY, type, 1f);
+	}
+	/**
+	 * Retrieves the first object matching {@code type} within {@code range} of an offset.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param oX The X-axis value of the offset.
+	 * @param oY The Y-axis value of the offset.
+	 * @param type The type of {@link Actor} to match.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
+	 * @return The first object in the {@link World} matching {@code type} at ({@code oX}, {@code oY}) from the {@link Actor}'s position.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type, float range) throws NoWorldException
 	{
 		World world = getWorld();
 		if(world == null) return null;
@@ -410,7 +466,28 @@ public abstract class Actor
 				return actor;
 		return null;
 	}
-	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type)
+	/**
+	 * Retrieves the first object matching {@code type} within 1 unit of an offset.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param oX The X-axis value of the offset.
+	 * @param oY The Y-axis value of the offset.
+	 * @param type The type of {@link Actor} to match.
+	 * @return The first object in the {@link World} matching {@code type} at ({@code oX}, {@code oY}) from the {@link Actor}'s position.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type) throws NoWorldException
+	{
+		return getOneObjectAtOffset(oX, oY, type, 1f);
+	}
+	/**
+	 * Retrieves a list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
+	 * @param type The type of {@link Actor} to match.
+	 * @return A list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type) throws NoWorldException
 	{
 		World world = getWorld();
 		if(world == null) return null;
@@ -421,7 +498,15 @@ public abstract class Actor
 				retList.add(actor);
 		return retList;
 	}
-	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type)
+	/**
+	 * Retrieves the first object in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
+	 * @param type The type of {@link Actor} to match.
+	 * @return The first object in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type) throws NoWorldException
 	{
 		World world = getWorld();
 		if(world == null) return null;
@@ -431,15 +516,33 @@ public abstract class Actor
 				return actor;
 		return null;
 	}
-	public final <A extends Actor> List<A> getNeighbours(float range, Class<A> type)
+	/**
+	 * Retrieves a list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
+	 * Due to the difference in how this library and Greenfoot work, this is just an alias to {@link #getObjectsInRange(float, Class)}.
+	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
+	 * @param type The type of {@link Actor} to match.
+	 * @return A list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
+	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
+	 */
+	public final <A extends Actor> List<A> getNeighbours(float range, Class<A> type) throws NoWorldException
 	{
 		return getObjectsInRange(range, type);
 	}
+	/**
+	 * Rotates the {@link Actor} to face it's right side towards the position ({@code x}, {@code y}). Does nothing if the position provided is the position of the {@link Actor}.
+	 * @param x The X-axis position to turn towards.
+	 * @param y The Y-axis position to turn towards.
+	 */
 	public final void turnTowards(float x, float y)
 	{
 		if(x == _x && y == _y) return;
 		_rotation = degrees(atan2(y - _y, x - _x));
 	}
+	/**
+	 * Rotates the {@link Actor} to face it's right side towards another {@link Actor}.
+	 * @param obj The other {@link Actor} to turn towards.
+	 */
 	public final void turnTowards(Actor obj)
 	{
 		if(obj == this || (obj.getX() == _x && obj.getY() == _y)) return; //Because it is impossible to turn towards where you already are
@@ -447,6 +550,10 @@ public abstract class Actor
 	}
 	
 	//Base Methods
+	/**
+	 * Renders the {@link Actor} to the screen. By default, this method renders the {@link Actor} with it's image, position, rotation, and opacity taken into account, but it can be overridden for further use.
+	 * When drawing, everything is relative to the {@link Actor}'s position.
+	 */
 	public void draw() //Overridable
 	{
 		if(_image == null) return;
@@ -457,8 +564,20 @@ public abstract class Actor
 		app.translate(-_width / 2f, -_height / 2f);
 		app.image(_image, 0, 0, _width, _height);
 	}
+	/**
+	 * Called when the {@link Actor} is added to any {@link World}. By default, this method does nothing.
+	 * @param world The {@link World} the {@link Actor} was added to.
+	 */
 	public void addedToWorld(World world) {}
+	/**
+	 * Called when the {@link Actor} is removed from any {@link World}. By default, this method does nothing.
+	 * @param world The {@link World} the {@link Actor} was removed from.
+	 */
 	public void removedFromWorld(World world) {}
 	
+	/**
+	 * Called once per frame. This is likely where most work with the {@link Actor} will be done.
+	 * @param deltaTime The time, in seconds, since the last time this method was called.
+	 */
 	public abstract void act(float deltaTime);
 }
