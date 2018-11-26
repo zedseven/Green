@@ -9,7 +9,7 @@ public abstract class World
 {
 	private Green green;
 	private PApplet app;
-	private UUID uuid = UUID.randomUUID();
+	private UUID uuid;
 	
 	private int _width;
 	private int _height;
@@ -26,6 +26,66 @@ public abstract class World
 	private long _lastMillis = 0;
 	
 	//Constructors
+	public World()
+	{
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
+	public World(int bgColor)
+	{
+		_backgroundColour = bgColor;
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
+	public World(PImage bgImage)
+	{
+		_backgroundImage = bgImage;
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
+	public World(int bgColor, PImage bgImage)
+	{
+		_backgroundColour = bgColor;
+		_backgroundImage = bgImage;
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
+	public World(boolean unbounded)
+	{
+		_unbounded = unbounded;
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
+	public World(int bgColor, boolean unbounded)
+	{
+		_backgroundColour = bgColor;
+		_unbounded = unbounded;
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
+	public World(PImage bgImage, boolean unbounded)
+	{
+		_backgroundImage = bgImage;
+		_unbounded = unbounded;
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
+	public World(int bgColor, PImage bgImage, boolean unbounded)
+	{
+		_backgroundColour = bgColor;
+		_backgroundImage = bgImage;
+		_unbounded = unbounded;
+		init();
+		_width = app.width;
+		_height = app.height;
+	}
 	public World(int w, int h)
 	{
 		_width = w;
@@ -88,6 +148,7 @@ public abstract class World
 	}
 	private void init()
 	{
+		uuid = UUID.randomUUID();
 		green = Green.getInstance();
 		app = green.getParent();
 	}
@@ -312,6 +373,10 @@ public abstract class World
 	 */
 	public final void handleDraw()
 	{
+		float screenMinX = 0f;
+		float screenMinY = 0f;
+		float screenMaxX = app.width;
+		float screenMaxY = app.height;
 		if(_width < app.width || _height < app.height)
 		{
 			app.background(_outOfBoundsColour);
@@ -323,6 +388,15 @@ public abstract class World
 		{
 			app.background(_backgroundColour);
 			app.translate(app.width / 2f - _camFollowActor.getX(), app.height / 2f - _camFollowActor.getY());
+			if(_onlyDrawOnScreen)
+			{
+				float screenHalfWidth = app.width / 2f;
+				float screenHalfHeight = app.height / 2f;
+				screenMinX += _camFollowActor.getX() - screenHalfWidth;
+				screenMinY += _camFollowActor.getY() - screenHalfHeight;
+				screenMaxX += _camFollowActor.getX() - screenHalfWidth;
+				screenMaxY += _camFollowActor.getY() - screenHalfHeight;
+			}
 		}
 		else
 		{
@@ -331,23 +405,12 @@ public abstract class World
 		app.fill(-16777216); //app.color(0, 0, 0)
 		if(_backgroundImage != null)
 			app.image(_backgroundImage, 0, 0, _width, _height);
-		float screenMinX = 0f;
-		float screenMinY = 0f;
-		float screenMaxX = 0f;
-		float screenMaxY = 0f;
-		if(_onlyDrawOnScreen)
-		{
-			screenMinX = _camFollowActor.getX() - app.width / 2f;
-			screenMinY = _camFollowActor.getY() - app.height / 2f;
-			screenMaxX = _camFollowActor.getX() + app.width / 2f;
-			screenMaxY = _camFollowActor.getY() + app.height / 2f;
-		}
 		Collections.sort(_actors, (a1, a2) -> { return Math.round(a1.getZ() - a2.getZ()); });
 		for(Actor actor : _actors)
 		{
 			if(_onlyDrawOnScreen)
 			{
-				float maxDim = Math.max(actor.getWidth(), actor.getHeight());
+				float maxDim = Math.max(actor.getWidth(), actor.getHeight()) / 2f;
 				if(actor.getX() + maxDim < screenMinX || actor.getX() - maxDim > screenMaxX || actor.getY() + maxDim < screenMinY || actor.getY() - maxDim > screenMaxY)
 					continue;
 			}
@@ -358,7 +421,7 @@ public abstract class World
 		}
 	}
 	/**
-	 * Calls the {@link Actor#act(float) method on every {@link Actor} in the {@link World}.
+	 * Calls the {@link Actor#act(float)} method on every {@link Actor} in the {@link World}.
 	 */
 	public final void handleAct()
 	{
@@ -366,8 +429,8 @@ public abstract class World
 		float deltaTime = (currentMillis - _lastMillis) / 1000f;
 		_lastMillis = currentMillis;
 		act(deltaTime);
-		for(Actor actor : _actors)
-			actor.act(deltaTime);
+		for(int i = _actors.size() - 1; i >= 0; i--) //for(Actor actor : _actors) <- This cannot be used here because if removeObject() is used within an act(), a ConcurrentModificationException is thrown
+			_actors.get(i).act(deltaTime);
 	}
 	
 	/**

@@ -157,7 +157,7 @@ public class Green
 		world.handleDraw();
 	}
 	/**
-	 * Calls the {@link Actor#act(float) method on every {@link Actor} in the currently-loaded {@link World}.
+	 * Calls the {@link Actor#act(float)} method on every {@link Actor} in the currently-loaded {@link World}.
 	 * @throws NoWorldException Thrown when the method is called and there is no {@link World} loaded.
 	 */
 	public void handleAct() throws NoWorldException

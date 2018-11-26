@@ -13,7 +13,7 @@ public abstract class Actor
 {
 	private Green green;
 	private PApplet app;
-	private UUID uuid = UUID.randomUUID();
+	private UUID uuid;
 	
 	private float _x = 0;
 	private float _y = 0;
@@ -62,6 +62,7 @@ public abstract class Actor
 	}
 	private void init()
 	{
+		uuid = UUID.randomUUID();
 		green = Green.getInstance();
 		app = green.getParent();
 	}
@@ -144,7 +145,7 @@ public abstract class Actor
 		return _opacity;
 	}
 	/**
-	 * Retrieves the current {@link World} this {@link Actor} is in, or {@link null} otherwise.
+	 * Retrieves the current {@link World} this {@link Actor} is in, or null otherwise.
 	 * @return The world this {@link Actor} is a part of that is currently loaded.
 	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
@@ -163,7 +164,7 @@ public abstract class Actor
 		return null;
 	}
 	/**
-	 * Retrieves the current {@link World} this {@link Actor} is in as {@code type} if possible, or {@link null} otherwise.
+	 * Retrieves the current {@link World} this {@link Actor} is in as {@code type} if possible, or null otherwise.
 	 * @param <W> The type of {@link World} to return if possible, as defined by {@code type}.
 	 * @param type The type of {@link World} to return if possible.
 	 * @return The world this {@link Actor} is a part of that is currently loaded.
@@ -385,7 +386,7 @@ public abstract class Actor
 	public final <A extends Actor> List<A> getIntersectingObjects(Class<A> type) throws NoWorldException //Compares rects of images
 	{
 		World world = getWorld();
-		List<A> actors = (List<A>) world.getObjects(type);
+		List<A> actors = world.getObjects(type);
 		List<A> retList = new ArrayList<A>();
 		for(A actor : actors)
 			if(intersects(actor))
@@ -402,7 +403,7 @@ public abstract class Actor
 	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) throws NoWorldException //Compares rects of images
 	{
 		World world = getWorld();
-		List<A> actors = (List<A>) world.getObjects(type);
+		List<A> actors = world.getObjects(type);
 		for(A actor : actors)
 			if(intersects(actor))
 				return actor;
