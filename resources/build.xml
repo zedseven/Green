@@ -73,7 +73,7 @@
 
 	<!-- Create the time stamp -->
 	<tstamp> 
-		<format property="date" pattern="MM/dd/yyyy" offset="0" unit="hour"/>
+		<format property="date" pattern="yyyy-MM-dd" offset="0" unit="hour"/>
 	</tstamp>
 	
 	<target name="init"> 
