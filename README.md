@@ -1,5 +1,5 @@
 # Green
-## A library for Processing written by Zacchary Dempsey-Plante
+#### A library for Processing written by Zacchary Dempsey-Plante
 This is a relatively simple library designed to emulate most of the features of [Greenfoot](https://www.greenfoot.org/) in [Processing](https://processing.org/).
 This was done for a school project, so it will likely _not_ be maintained. 
 
