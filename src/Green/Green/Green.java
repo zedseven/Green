@@ -1,5 +1,8 @@
 package Green;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import processing.core.*;
 import static processing.core.PApplet.sin;
 import static processing.core.PApplet.cos;
@@ -11,6 +14,8 @@ public class Green
 	private PApplet parent;
 	
 	private static World _currentWorld;
+	
+	private Set<InputKey> _keysDown = new HashSet<InputKey>();
 	
 	//Constructors
 	public Green(PApplet theParent)
@@ -165,6 +170,32 @@ public class Green
 		World world = getWorld();
 		if(world == null) throw new NoWorldException();
 		world.handleAct();
+	}
+	public final void handleInputDown(char key, int keyCode)
+	{
+		_keysDown.add(new InputKey(key, keyCode));
+	}
+	public final void handleInputUp(char key, int keyCode)
+	{
+		_keysDown.remove(new InputKey(key, keyCode));
+	}
+	public final boolean isKeyDown(char key)
+	{
+		List<InputKey> result = _keysDown.stream()
+				.filter(item -> item.getKey() == key)
+				.collect(Collectors.toList());
+		return result.size() > 0;
+	}
+	public final boolean isKeyDown(int keyCode)
+	{
+		List<InputKey> result = _keysDown.stream()
+				.filter(item -> item.getKeyCode() == keyCode)
+				.collect(Collectors.toList());
+		return result.size() > 0;
+	}
+	public final boolean isKeyDown(InputKey key)
+	{
+		return _keysDown.contains(key);
 	}
 }
 
