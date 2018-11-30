@@ -3,7 +3,7 @@ package Green;
 import java.util.*;
 import processing.core.*;
 import static processing.core.PApplet.floor;
-import static processing.core.PApplet.ceil;
+//import static processing.core.PApplet.ceil;
 
 public abstract class World
 {
@@ -16,6 +16,7 @@ public abstract class World
 	
 	private int _backgroundColour = -1;//app.color(255, 255, 255);
 	private int _outOfBoundsColour = -16777216;
+	private PImage _sourceBackgroundImage = null;
 	private PImage _backgroundImage = null;
 	private boolean _unbounded = false;
 	private boolean _onlyDrawOnScreen = true;
@@ -41,116 +42,131 @@ public abstract class World
 	}
 	public World(PImage bgImage)
 	{
-		_backgroundImage = bgImage;
 		init();
-		_width = app.width;
-		_height = app.height;
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
+		_width = bgImage.width;
+		_height = bgImage.height;
 	}
 	public World(int bgColor, PImage bgImage)
 	{
-		_backgroundColour = bgColor;
-		_backgroundImage = bgImage;
 		init();
-		_width = app.width;
-		_height = app.height;
+		_backgroundColour = bgColor;
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
+		_width = bgImage.width;
+		_height = bgImage.height;
 	}
 	public World(boolean unbounded)
 	{
-		_unbounded = unbounded;
 		init();
+		_unbounded = unbounded;
 		_width = app.width;
 		_height = app.height;
 	}
 	public World(int bgColor, boolean unbounded)
 	{
+		init();
 		_backgroundColour = bgColor;
 		_unbounded = unbounded;
-		init();
 		_width = app.width;
 		_height = app.height;
 	}
 	public World(PImage bgImage, boolean unbounded)
 	{
-		_backgroundImage = bgImage;
-		_unbounded = unbounded;
 		init();
-		_width = app.width;
-		_height = app.height;
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
+		_unbounded = unbounded;
+		_width = bgImage.width;
+		_height = bgImage.height;
 	}
 	public World(int bgColor, PImage bgImage, boolean unbounded)
 	{
-		_backgroundColour = bgColor;
-		_backgroundImage = bgImage;
-		_unbounded = unbounded;
 		init();
-		_width = app.width;
-		_height = app.height;
+		_backgroundColour = bgColor;
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
+		_unbounded = unbounded;
+		_width = bgImage.width;
+		_height = bgImage.height;
 	}
 	public World(int w, int h)
 	{
+		init();
 		_width = w;
 		_height = h;
-		init();
 	}
 	public World(int w, int h, int bgColor)
 	{
+		init();
 		_width = w;
 		_height = h;
 		_backgroundColour = bgColor;
-		init();
 	}
 	public World(int w, int h, PImage bgImage)
 	{
+		init();
 		_width = w;
 		_height = h;
-		_backgroundImage = bgImage;
-		init();
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
 	}
 	public World(int w, int h, int bgColor, PImage bgImage)
 	{
+		init();
 		_width = w;
 		_height = h;
 		_backgroundColour = bgColor;
-		_backgroundImage = bgImage;
-		init();
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
 	}
 	public World(int w, int h, boolean unbounded)
 	{
+		init();
 		_width = w;
 		_height = h;
 		_unbounded = unbounded;
-		init();
 	}
 	public World(int w, int h, int bgColor, boolean unbounded)
 	{
+		init();
 		_width = w;
 		_height = h;
 		_backgroundColour = bgColor;
 		_unbounded = unbounded;
-		init();
 	}
 	public World(int w, int h, PImage bgImage, boolean unbounded)
 	{
+		init();
 		_width = w;
 		_height = h;
-		_backgroundImage = bgImage;
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
 		_unbounded = unbounded;
-		init();
 	}
 	public World(int w, int h, int bgColor, PImage bgImage, boolean unbounded)
 	{
+		init();
 		_width = w;
 		_height = h;
 		_backgroundColour = bgColor;
-		_backgroundImage = bgImage;
+		_sourceBackgroundImage = bgImage;
+		scaleBackgroundImage(_width, _height);
 		_unbounded = unbounded;
-		init();
 	}
 	private void init()
 	{
 		uuid = UUID.randomUUID();
 		green = Green.getInstance();
 		app = green.getParent();
+	}
+	private void scaleBackgroundImage(int w, int h)
+	{
+		_backgroundImage = _sourceBackgroundImage.get();
+		if(_sourceBackgroundImage.width == w && _sourceBackgroundImage.height == h)
+			return;
+		_backgroundImage.resize(w, h);
 	}
 	public String toString()
 	{
@@ -189,6 +205,22 @@ public abstract class World
 	public final int getBackgroundColor()
 	{
 		return _backgroundColour;
+	}
+	/**
+	 * Retrieves the original image supplied as the background image, before any scaling has been applied.
+	 * @return The original image supplied as the background image, before any scaling has been applied.
+	 */
+	public final PImage getSourceBackgroundImage()
+	{
+		return _sourceBackgroundImage;
+	}
+	/**
+	 * Retrieves the background image currently in use, with scaling applied.
+	 * @return The background image currently in use, with scaling applied.
+	 */
+	public final PImage getBackgroundImage()
+	{
+		return _backgroundImage;
 	}
 	/**
 	 * Retrieves the out-of-bounds colour of the {@link World}. This is only applicable if {@link #setCamFollowActor(Actor)} is in use, or the screen size is larger than the size of the {@link World}.
@@ -261,6 +293,44 @@ public abstract class World
 	
 	//Setters
 	/**
+	 * Sets the width of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether or not {@link #setUnbounded(boolean)} has been used, etc.
+	 * @param width The width to set.
+	 */
+	public final void setWidth(int width)
+	{
+		_width = width;
+		scaleBackgroundImage(_width, _height);
+		if(!_unbounded)
+			for(Actor actor : _actors)
+				actor.setLocation(actor.getX(), actor.getY());
+	}
+	/**
+	 * Sets the height of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether or not {@link #setUnbounded(boolean)} has been used, etc.
+	 * @param height The height to set.
+	 */
+	public final void setHeight(int height)
+	{
+		_height = height;
+		scaleBackgroundImage(_width, _height);
+		if(!_unbounded)
+			for(Actor actor : _actors)
+				actor.setLocation(actor.getX(), actor.getY());
+	}
+	/**
+	 * Sets the dimensions of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether or not {@link #setUnbounded(boolean)} has been used, etc.
+	 * @param width The width to set.
+	 * @param height The height to set.
+	 */
+	public final void setDimensions(int width, int height)
+	{
+		_width = width;
+		_height = height;
+		scaleBackgroundImage(_width, _height);
+		if(!_unbounded)
+			for(Actor actor : _actors)
+				actor.setLocation(actor.getX(), actor.getY());
+	}
+	/**
 	 * Sets the background colour of the {@link World}. This is drawn-over if a background image is set.
 	 * @param newColour The colour to set as the background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
 	 */
@@ -277,6 +347,15 @@ public abstract class World
 	public final void setBackgroundColor(int newColourR, int newColourG, int newColourB)
 	{
 		_backgroundColour = app.color(newColourR, newColourG, newColourB);
+	}
+	/**
+	 * Sets the background image of the {@link World}.
+	 * @param image The image to set as the background.
+	 */
+	public final void setBackgroundImage(PImage image)
+	{
+		_sourceBackgroundImage = image;
+		scaleBackgroundImage(_width, _height);
 	}
 	/**
 	 * Sets the out-of-bounds colour of the {@link World}. This is only applicable if {@link #setCamFollowActor(Actor)} is in use, or the screen size is larger than the size of the {@link World}.
@@ -386,16 +465,24 @@ public abstract class World
 		}
 		else if((_width > app.width || _height > app.height) && _camFollowActor != null)
 		{
-			app.background(_backgroundColour);
-			app.translate(app.width / 2f - _camFollowActor.getX(), app.height / 2f - _camFollowActor.getY());
+			float camFollowX = _camFollowActor.getX();
+			float camFollowY = _camFollowActor.getY();
+			
+			app.background(_outOfBoundsColour);
+			app.translate(app.width / 2f - camFollowX, app.height / 2f - camFollowY);
+			if(_backgroundImage == null)
+			{
+				app.fill(_backgroundColour);
+				app.rect(0, 0, _width, _height);
+			}
 			if(_onlyDrawOnScreen)
 			{
 				float screenHalfWidth = app.width / 2f;
 				float screenHalfHeight = app.height / 2f;
-				screenMinX += _camFollowActor.getX() - screenHalfWidth;
-				screenMinY += _camFollowActor.getY() - screenHalfHeight;
-				screenMaxX += _camFollowActor.getX() - screenHalfWidth;
-				screenMaxY += _camFollowActor.getY() - screenHalfHeight;
+				screenMinX += camFollowX - screenHalfWidth;
+				screenMinY += camFollowY - screenHalfHeight;
+				screenMaxX += camFollowX - screenHalfWidth;
+				screenMaxY += camFollowY - screenHalfHeight;
 			}
 		}
 		else

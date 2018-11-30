@@ -19,52 +19,63 @@ public abstract class Actor
 	private float _y = 0;
 	private float _z = 0;
 	private float _rotation = 0;
+	private PImage _sourceImage = null;
 	private PImage _image = null;
-	private float _width;
-	private float _height;
+	private int _width;
+	private int _height;
 	private float _opacity = 255;
 	
 	//Constructors
 	public Actor(float x, float y, PImage image) //TODO: Add GIF support
 	{
+		init();
 		_x = x;
 		_y = y;
-		_image = image;
+		_sourceImage = image;
 		_width = _image.width;
 		_height = _image.height;
-		init();
+		scaleImage(_width, _height);
 	}
-	public Actor(float x, float y, float w, float h)
+	public Actor(float x, float y, int w, int h)
 	{
+		init();
 		_x = x;
 		_y = y;
 		_width = w;
 		_height = h;
-		init();
 	}
-	public Actor(float x, float y, PImage image, float w, float h)
+	public Actor(float x, float y, PImage image, int w, int h)
 	{
+		init();
 		_x = x;
 		_y = y;
-		_image = image;
+		_sourceImage = image;
 		_width = w;
 		_height = h;
-		init();
+		scaleImage(_width, _height);
 	}
 	public Actor(float x, float y, PImage image, float scaleMultiplier)
 	{
+		init();
 		_x = x;
 		_y = y;
-		_image = image;
-		_width = _image.width * scaleMultiplier;
-		_height = _image.height * scaleMultiplier;
-		init();
+		_sourceImage = image;
+		_width = Math.round(_sourceImage.width * scaleMultiplier);
+		_height = Math.round(_sourceImage.height * scaleMultiplier);
+		scaleImage(_width, _height);
 	}
 	private void init()
 	{
 		uuid = UUID.randomUUID();
 		green = Green.getInstance();
 		app = green.getParent();
+	}
+	private void scaleImage(int w, int h)
+	{
+		_image = _sourceImage.get();
+		if(_sourceImage.width == w && _sourceImage.height == h)
+			return;
+		_image.resize(w, h);
 	}
 	public String toString()
 	{
@@ -110,13 +121,13 @@ public abstract class Actor
 	 */
 	public final float getRotation()
 	{
-		return _rotation;
+		return degrees(_rotation);
 	}
 	/**
 	 * Retrieves the width of the {@link Actor}.
 	 * @return The width.
 	 */
-	public final float getWidth()
+	public final int getWidth()
 	{
 		return _width;
 	}
@@ -124,9 +135,17 @@ public abstract class Actor
 	 * Retrieves the height of the {@link Actor}.
 	 * @return The height.
 	 */
-	public final float getHeight()
+	public final int getHeight()
 	{
 		return _height;
+	}
+	/**
+	 * Retrieves the original {@link processing.core.PImage} (before any scaling has been applied) associated with the {@link Actor}.
+	 * @return The original associated image.
+	 */
+	public final PImage getSourceImage()
+	{
+		return _sourceImage;
 	}
 	/**
 	 * Retrieves the {@link processing.core.PImage} associated with the {@link Actor}.
@@ -236,33 +255,36 @@ public abstract class Actor
 	 */
 	public final void setRotation(float rotation)
 	{
-		_rotation = rotation;
+		_rotation = radians(rotation);
 	}
 	/**
 	 * Sets the width of the {@link Actor}.
 	 * @param w The width value to set.
 	 */
-	public final void setWidth(float w)
+	public final void setWidth(int w)
 	{
 		_width = w;
+		scaleImage(_width, _height);
 	}
 	/**
 	 * Sets the height of the {@link Actor}.
 	 * @param h The height value to set.
 	 */
-	public final void setHeight(float h)
+	public final void setHeight(int h)
 	{
 		_height = h;
+		scaleImage(_width, _height);
 	}
 	/**
 	 * Sets the width and height of the {@link Actor}.
 	 * @param w The width value to set.
 	 * @param h The height value to set.
 	 */
-	public final void setDimensions(float w, float h)
+	public final void setDimensions(int w, int h)
 	{
 		_width = w;
 		_height = h;
+		scaleImage(_width, _height);
 	}
 	/**
 	 * Sets the image of the {@link Actor}.
@@ -270,7 +292,8 @@ public abstract class Actor
 	 */
 	public final void setImage(PImage image)
 	{
-		_image = image;
+		_sourceImage = image;
+		scaleImage(_width, _height);
 	}
 	/**
 	 * Sets the opacity value (in the range 0 - 255) of the {@link Actor}.
@@ -288,7 +311,7 @@ public abstract class Actor
 	 */
 	public final void move(float amount)
 	{
-		setLocation(_x + cos(radians(_rotation)) * amount, _y + sin(radians(_rotation)) * amount);
+		setLocation(_x + cos(_rotation) * amount, _y + sin(_rotation) * amount);
 	}
 	/**
 	 * Moves the {@link Actor} {@code x} units on the X-axis and {@code y} units on the Y-axis.
@@ -330,8 +353,8 @@ public abstract class Actor
 		if(actor == this)
 			return false;
 		
-		float rot1Sin = sin(radians(_rotation));
-		float rot1Cos = cos(radians(_rotation));
+		float rot1Sin = sin(_rotation);
+		float rot1Cos = cos(_rotation);
 		float edge1X = _width / 2f;
 		float edge1Y = _height / 2f;
 		float rot2Sin = sin(radians(actor.getRotation()));
@@ -538,7 +561,7 @@ public abstract class Actor
 	public final void turnTowards(float x, float y)
 	{
 		if(x == _x && y == _y) return;
-		_rotation = degrees(atan2(y - _y, x - _x));
+		_rotation = atan2(y - _y, x - _x);
 	}
 	/**
 	 * Rotates the {@link Actor} to face it's right side towards another {@link Actor}.
@@ -547,7 +570,7 @@ public abstract class Actor
 	public final void turnTowards(Actor obj)
 	{
 		if(obj == this || (obj.getX() == _x && obj.getY() == _y)) return; //Because it is impossible to turn towards where you already are
-		_rotation = degrees(atan2(obj.getY() - _y, obj.getX() - _x));
+		_rotation = atan2(obj.getY() - _y, obj.getX() - _x);
 	}
 	
 	//Base Methods
@@ -561,7 +584,7 @@ public abstract class Actor
 		app.smooth();
 		app.tint(255, _opacity);
 		//app.translate(_x, _y);
-		app.rotate(radians(_rotation));
+		app.rotate(_rotation);
 		app.translate(-_width / 2f, -_height / 2f);
 		app.image(_image, 0, 0, _width, _height);
 	}
