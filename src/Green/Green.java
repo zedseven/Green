@@ -8,6 +8,14 @@ import static processing.core.PApplet.sin;
 import static processing.core.PApplet.cos;
 import static processing.core.PApplet.tan;
 
+/**
+ * The main class of the library. This handles inputs, provides a few utility functions, 
+ * and provides a {@link World}-independent way to call {@link #handleAct()} and {@link #handleDraw()}.
+ * <br><br>
+ * A single instance of this class should be created in {@link processing.core.PApplet#setup()}
+ * by supplying '{@code this}' as the parameter.
+ * @author Zacchary Dempsey-Plante
+ */
 public class Green
 {
 	private static Green instance;
@@ -18,8 +26,14 @@ public class Green
 	private Set<InputKey> _keysDown = new HashSet<InputKey>();
 	
 	//Constructors
+	/**
+	 * Starts the backbone of the library.
+	 * @param theParent The {@link processing.core.PApplet} running the library.
+	 * @throws SingleInstanceException Thrown when this constructor is called more than once.
+	 */
 	public Green(PApplet theParent)
 	{
+		if(instance != null) throw new SingleInstanceException();
 		instance = this;
 		parent = theParent;
 	}
@@ -142,7 +156,7 @@ public class Green
 	
 	//Base Methods
 	/**
-	 * Loads a {@link World} so to make it the one currently in use.
+	 * Loads a {@link World} to make it the one currently in use.
 	 * @param world The {@link World} to load.
 	 */
 	public void loadWorld(World world)

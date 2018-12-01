@@ -3,8 +3,12 @@ package Green;
 import java.util.*;
 import processing.core.*;
 import static processing.core.PApplet.floor;
-//import static processing.core.PApplet.ceil;
 
+/**
+ * The base class for all worlds in the library. A world is it's own area for a collection of {@link Actor} instances to interact in, though any given {@link Actor} can be within multiple worlds at a time.
+ * Only one world may be active at a time however, which can be changed by calling {@link Green#loadWorld(World)}.
+ * @author Zacchary Dempsey-Plante
+ */
 public abstract class World
 {
 	private Green green;
@@ -27,12 +31,19 @@ public abstract class World
 	private long _lastMillis = 0;
 	
 	//Constructors
+	/**
+	 * Creates a new world using the screen dimensions.
+	 */
 	public World()
 	{
 		init();
 		_width = app.width;
 		_height = app.height;
 	}
+	/**
+	 * Creates a new world using the screen dimensions with a background colour.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 */
 	public World(int bgColor)
 	{
 		_backgroundColour = bgColor;
@@ -40,23 +51,36 @@ public abstract class World
 		_width = app.width;
 		_height = app.height;
 	}
+	/**
+	 * Creates a new world using the screen dimensions with a background image.
+	 * @param bgImage The background image.
+	 */
 	public World(PImage bgImage)
 	{
 		init();
 		_sourceBackgroundImage = bgImage;
-		scaleBackgroundImage(_width, _height);
 		_width = bgImage.width;
 		_height = bgImage.height;
+		scaleBackgroundImage(_width, _height);
 	}
+	/**
+	 * Creates a new world using the screen dimensions with a background image and a background colour to draw underneath.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param bgImage The background image.
+	 */
 	public World(int bgColor, PImage bgImage)
 	{
 		init();
 		_backgroundColour = bgColor;
 		_sourceBackgroundImage = bgImage;
-		scaleBackgroundImage(_width, _height);
 		_width = bgImage.width;
 		_height = bgImage.height;
+		scaleBackgroundImage(_width, _height);
 	}
+	/**
+	 * Creates a new world using the screen dimensions, set to be bounded or otherwise.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(boolean unbounded)
 	{
 		init();
@@ -64,6 +88,11 @@ public abstract class World
 		_width = app.width;
 		_height = app.height;
 	}
+	/**
+	 * Creates a new world using the screen dimensions with a background colour, set to be bounded or otherwise.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(int bgColor, boolean unbounded)
 	{
 		init();
@@ -72,31 +101,53 @@ public abstract class World
 		_width = app.width;
 		_height = app.height;
 	}
+	/**
+	 * Creates a new world using the screen dimensions with a background image, set to be bounded or otherwise.
+	 * @param bgImage The background image.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(PImage bgImage, boolean unbounded)
 	{
 		init();
 		_sourceBackgroundImage = bgImage;
-		scaleBackgroundImage(_width, _height);
-		_unbounded = unbounded;
 		_width = bgImage.width;
 		_height = bgImage.height;
+		scaleBackgroundImage(_width, _height);
+		_unbounded = unbounded;
 	}
+	/**
+	 * Creates a new world using the screen dimensions with a background image and a background colour to draw underneath, set to be bounded or otherwise.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param bgImage The background image.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(int bgColor, PImage bgImage, boolean unbounded)
 	{
 		init();
 		_backgroundColour = bgColor;
 		_sourceBackgroundImage = bgImage;
-		scaleBackgroundImage(_width, _height);
-		_unbounded = unbounded;
 		_width = bgImage.width;
 		_height = bgImage.height;
+		scaleBackgroundImage(_width, _height);
+		_unbounded = unbounded;
 	}
+	/**
+	 * Creates a new world with defined dimensions.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 */
 	public World(int w, int h)
 	{
 		init();
 		_width = w;
 		_height = h;
 	}
+	/**
+	 * Creates a new world with defined dimensions and a background colour.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 */
 	public World(int w, int h, int bgColor)
 	{
 		init();
@@ -104,6 +155,12 @@ public abstract class World
 		_height = h;
 		_backgroundColour = bgColor;
 	}
+	/**
+	 * Creates a new world with defined dimensions and a background image.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgImage The background image.
+	 */
 	public World(int w, int h, PImage bgImage)
 	{
 		init();
@@ -112,6 +169,13 @@ public abstract class World
 		_sourceBackgroundImage = bgImage;
 		scaleBackgroundImage(_width, _height);
 	}
+	/**
+	 * Creates a new world with defined dimensions and a background image with a background colour to draw underneath.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param bgImage The background image.
+	 */
 	public World(int w, int h, int bgColor, PImage bgImage)
 	{
 		init();
@@ -121,6 +185,12 @@ public abstract class World
 		_sourceBackgroundImage = bgImage;
 		scaleBackgroundImage(_width, _height);
 	}
+	/**
+	 * Creates a new world with defined dimensions, set to be bounded or otherwise.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(int w, int h, boolean unbounded)
 	{
 		init();
@@ -128,6 +198,13 @@ public abstract class World
 		_height = h;
 		_unbounded = unbounded;
 	}
+	/**
+	 * Creates a new world with defined dimensions and a background colour, set to be bounded or otherwise.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(int w, int h, int bgColor, boolean unbounded)
 	{
 		init();
@@ -136,6 +213,13 @@ public abstract class World
 		_backgroundColour = bgColor;
 		_unbounded = unbounded;
 	}
+	/**
+	 * Creates a new world with defined dimensions and a background image, set to be bounded or otherwise.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgImage The background image.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(int w, int h, PImage bgImage, boolean unbounded)
 	{
 		init();
@@ -145,6 +229,14 @@ public abstract class World
 		scaleBackgroundImage(_width, _height);
 		_unbounded = unbounded;
 	}
+	/**
+	 * Creates a new world with defined dimensions and a background image with a background colour to draw underneath, set to be bounded or otherwise.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param bgImage The background image.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 */
 	public World(int w, int h, int bgColor, PImage bgImage, boolean unbounded)
 	{
 		init();
@@ -168,6 +260,36 @@ public abstract class World
 			return;
 		_backgroundImage.resize(w, h);
 	}
+	
+	//Object class overrides
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(this == obj)
+			return true;
+		if(obj == null)
+			return false;
+		if(getClass() != obj.getClass())
+			return false;
+		World other = (World) obj;
+		if(uuid == null)
+		{
+			if (other.uuid != null)
+				return false;
+		}
+		else if(!uuid.equals(other.uuid))
+			return false;
+		return true;
+	}
+	@Override
 	public String toString()
 	{
 		return "World \"" + this.getClass().getSimpleName() + "\" #" + uuid + " (" + _width + ", " + _height + ")";

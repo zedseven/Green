@@ -9,6 +9,11 @@ import static processing.core.PApplet.atan2;
 import static processing.core.PApplet.degrees;
 import static processing.core.PApplet.radians;
 
+/**
+ * The base class for all objects in the library. It supports movement, rotation, opacity, custom sprites, custom frame-by-frame drawing, and render order.
+ * It's position system is from top-left to bottom-right.
+ * @author Zacchary Dempsey-Plante
+ */
 public abstract class Actor
 {
 	private Green green;
@@ -26,16 +31,29 @@ public abstract class Actor
 	private float _opacity = 255;
 	
 	//Constructors
+	/**
+	 * Creates the new actor at a position with a sprite.
+	 * @param x The X-axis position to start the actor at.
+	 * @param y The Y-axis position to start the actor at.
+	 * @param image The image to use with the actor.
+	 */
 	public Actor(float x, float y, PImage image) //TODO: Add GIF support
 	{
 		init();
 		_x = x;
 		_y = y;
 		_sourceImage = image;
-		_width = _image.width;
-		_height = _image.height;
-		scaleImage(_width, _height);
+		_width = _sourceImage.width;
+		_height = _sourceImage.height;
+		scaleImage(_width, _height); //Just to update the _image variable
 	}
+	/**
+	 * Creates the new actor at a position with a defined width and height.
+	 * @param x The X-axis position to start the actor at.
+	 * @param y The Y-axis position to start the actor at.
+	 * @param w The width to create the actor with.
+	 * @param h The height to create the actor with.
+	 */
 	public Actor(float x, float y, int w, int h)
 	{
 		init();
@@ -44,6 +62,14 @@ public abstract class Actor
 		_width = w;
 		_height = h;
 	}
+	/**
+	 * Creates the new actor at a position with a sprite stretched to fit the defined width and height.
+	 * @param x The X-axis position to start the actor at.
+	 * @param y The Y-axis position to start the actor at.
+	 * @param image The image to use with the actor.
+	 * @param w The width to create the actor with.
+	 * @param h The height to create the actor with.
+	 */
 	public Actor(float x, float y, PImage image, int w, int h)
 	{
 		init();
@@ -54,6 +80,13 @@ public abstract class Actor
 		_height = h;
 		scaleImage(_width, _height);
 	}
+	/**
+	 * Creates the new actor at a position with a sprite scaled by {@code scaleMultiplier}.
+	 * @param x The X-axis position to start the actor at.
+	 * @param y The Y-axis position to start the actor at.
+	 * @param image The image to use with the actor.
+	 * @param scaleMultiplier The multiplier to apply to {@code image}'s dimensions.
+	 */
 	public Actor(float x, float y, PImage image, float scaleMultiplier)
 	{
 		init();
@@ -77,6 +110,36 @@ public abstract class Actor
 			return;
 		_image.resize(w, h);
 	}
+	
+	//Object class overrides
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(this == obj)
+			return true;
+		if(obj == null)
+			return false;
+		if(getClass() != obj.getClass())
+			return false;
+		Actor other = (Actor) obj;
+		if(uuid == null)
+		{
+			if(other.uuid != null)
+				return false;
+		}
+		else if(!uuid.equals(other.uuid))
+			return false;
+		return true;
+	}
+	@Override
 	public String toString()
 	{
 		return "Actor \"" + this.getClass().getSimpleName() + "\" #" + uuid;
@@ -328,7 +391,7 @@ public abstract class Actor
 	 */
 	public final void turn(float degrees)
 	{
-		_rotation += degrees;
+		_rotation += radians(degrees);
 	}
 	
 	//Utility Functions
@@ -393,10 +456,10 @@ public abstract class Actor
 				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2LUX, c2LUY, c2RDX, c2RDY) || 
 				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2LUX, c2LUY, c2RDX, c2RDY) || 
 				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2LUX, c2LUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c1RUX, c2RUY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c1RUX, c2RUY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c1RUX, c2RUY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c1RUX, c2RUY, c2LUX, c2LUY)
+				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2RUX, c2RUY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RUX, c2RUY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RUX, c2RUY, c2LUX, c2LUY) || 
+				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RUX, c2RUY, c2LUX, c2LUY)
 			);
 	}
 	/**
@@ -560,7 +623,7 @@ public abstract class Actor
 	 */
 	public final void turnTowards(float x, float y)
 	{
-		if(x == _x && y == _y) return;
+		if(x == _x && y == _y) return; //Because it is impossible to turn towards where you already are
 		_rotation = atan2(y - _y, x - _x);
 	}
 	/**

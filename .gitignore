@@ -26,11 +26,5 @@ hs_err_pid*
 hs_err_pid*
 >>>>>>> 02698c69eddd056b562b4c35ac7eeb9f9aa2f597
 
-# Eclipse Project Files
-.settings/
-.classpath
-.project
-
 # General Files
-distribution/
 tmp/
