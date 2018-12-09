@@ -29,6 +29,7 @@ public abstract class Actor
 	private int _width;
 	private int _height;
 	private float _opacity = 255;
+	private int _resizeFormat = Green.NEAREST_NEIGHBOR;
 	
 	//Constructors
 	/**
@@ -97,6 +98,47 @@ public abstract class Actor
 		_height = Math.round(_sourceImage.height * scaleMultiplier);
 		scaleImage(_width, _height);
 	}
+	/**
+	 * Creates the new actor at a position with a sprite, resized according to {@code resizeFormat} to fit the defined width and height.
+	 * @param x The X-axis position to start the actor at.
+	 * @param y The Y-axis position to start the actor at.
+	 * @param image The image to use with the actor.
+	 * @param w The width to create the actor with.
+	 * @param h The height to create the actor with.
+	 * @param resizeFormat The image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
+	 */
+	public Actor(float x, float y, PImage image, int w, int h, int resizeFormat)
+	{
+		init();
+		_x = x;
+		_y = y;
+		_sourceImage = image;
+		_width = w;
+		_height = h;
+		setResizeFormat(resizeFormat); //To handle unknown resize formats
+		scaleImage(_width, _height);
+	}
+	/**
+	 * Creates the new actor at a position with a sprite scaled by {@code scaleMultiplier}, resized according to {@code resizeFormat}.
+	 * @param x The X-axis position to start the actor at.
+	 * @param y The Y-axis position to start the actor at.
+	 * @param image The image to use with the actor.
+	 * @param scaleMultiplier The multiplier to apply to {@code image}'s dimensions.
+	 * @param resizeFormat The image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
+	 */
+	public Actor(float x, float y, PImage image, float scaleMultiplier, int resizeFormat)
+	{
+		init();
+		_x = x;
+		_y = y;
+		_sourceImage = image;
+		_width = Math.round(_sourceImage.width * scaleMultiplier);
+		_height = Math.round(_sourceImage.height * scaleMultiplier);
+		setResizeFormat(resizeFormat); //To handle unknown resize formats
+		scaleImage(_width, _height);
+	}
 	private void init()
 	{
 		uuid = UUID.randomUUID();
@@ -105,10 +147,21 @@ public abstract class Actor
 	}
 	private void scaleImage(int w, int h)
 	{
-		_image = _sourceImage.get();
-		if(_sourceImage.width == w && _sourceImage.height == h)
-			return;
-		_image.resize(w, h);
+		if (_resizeFormat == Green.BILINEAR)
+		{
+			_image = _sourceImage.get();
+			if(_sourceImage.width == w && _sourceImage.height == h)
+				return;
+			_image.resize(w, h);
+		}
+		else if (_resizeFormat == Green.NEAREST_NEIGHBOR)
+		{
+			_image = green.resizeNN(_sourceImage, w, h);
+		}
+		else if (_resizeFormat == Green.TILE)
+		{
+			_image = green.tileImage(_sourceImage, w, h);
+		}
 	}
 	
 	//Object class overrides
@@ -225,6 +278,14 @@ public abstract class Actor
 	public final float getOpacity()
 	{
 		return _opacity;
+	}
+	/**
+	 * Retrieves the image resize format of the {@link Actor}.
+	 * @return The image resize format - either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 */
+	public final int getResizeFormat()
+	{
+		return _resizeFormat;
 	}
 	/**
 	 * Retrieves the current {@link World} this {@link Actor} is in, or null otherwise.
@@ -365,6 +426,17 @@ public abstract class Actor
 	public final void setOpacity(float opacity)
 	{
 		_opacity = opacity;
+	}
+	/**
+	 * Sets the image resize format of the {@link Actor}.
+	 * @param format The image resize format to set. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
+	 */
+	public final void setResizeFormat(int format)
+	{
+		if(format != Green.BILINEAR && format != Green.NEAREST_NEIGHBOR && format != Green.TILE)
+			throw new UnknownResizeFormatException();
+		_resizeFormat = format;
 	}
 	
 	//General Methods
@@ -643,13 +715,20 @@ public abstract class Actor
 	 */
 	public void draw() //Overridable
 	{
-		if(_image == null) return;
-		app.smooth();
-		app.tint(255, _opacity);
-		//app.translate(_x, _y);
-		app.rotate(_rotation);
-		app.translate(-_width / 2f, -_height / 2f);
-		app.image(_image, 0, 0, _width, _height);
+		if(_image != null)
+		{
+			app.smooth();
+			app.tint(255, _opacity);
+			//app.translate(_x, _y);
+			app.rotate(_rotation);
+			app.translate(-_width / 2f, -_height / 2f);
+			app.image(_image, 0, 0, _width, _height);
+		}
+		else
+		{
+			app.fill(-11692197); //color(77, 151, 91)
+			app.rect(-_width / 2f, -_height / 2f, _width, _height);
+		}
 	}
 	/**
 	 * Called when the {@link Actor} is added to any {@link World}. By default, this method does nothing.

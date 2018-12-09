@@ -30,8 +30,8 @@ public class InputKey
 	}
 	/**
 	 * Retrieves the keycode of the key that was pressed. 
-	 * Check the <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a> for a full list of keyCode values.
 	 * @return The keycode of the key that was pressed.
+	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
 	public int getKeyCode()
 	{

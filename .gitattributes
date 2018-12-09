@@ -1,0 +1,5 @@
+data/* linguist-vendored
+distribution/reference/* linguist-documentation
+distribution/* linguist-vendored
+lib/* linguist-vendored
+web/* linguist-vendored

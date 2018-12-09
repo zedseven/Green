@@ -11,8 +11,8 @@ import static processing.core.PApplet.floor;
  */
 public abstract class World
 {
-	private Green green;
-	private PApplet app;
+	protected Green green;
+	protected PApplet app;
 	private UUID uuid;
 	
 	private int _width;
@@ -24,11 +24,10 @@ public abstract class World
 	private PImage _backgroundImage = null;
 	private boolean _unbounded = false;
 	private boolean _onlyDrawOnScreen = true;
+	private int _resizeFormat = Green.TILE;
 	
 	private List<Actor> _actors = new ArrayList<Actor>();
 	private Actor _camFollowActor = null;
-	
-	private long _lastMillis = 0;
 	
 	//Constructors
 	/**
@@ -186,6 +185,42 @@ public abstract class World
 		scaleBackgroundImage(_width, _height);
 	}
 	/**
+	 * Creates a new world with defined dimensions and a background image. Also supplies a resizing format.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgImage The background image.
+	 * @param resizeFormat The background image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
+	 */
+	public World(int w, int h, PImage bgImage, int resizeFormat)
+	{
+		init();
+		_width = w;
+		_height = h;
+		_sourceBackgroundImage = bgImage;
+		setResizeFormat(resizeFormat); //To handle unknown resize formats
+		scaleBackgroundImage(_width, _height);
+	}
+	/**
+	 * Creates a new world with defined dimensions and a background image with a background colour to draw underneath. Also supplies a resizing format.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param bgImage The background image.
+	 * @param resizeFormat The background image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
+	 */
+	public World(int w, int h, int bgColor, PImage bgImage, int resizeFormat)
+	{
+		init();
+		_width = w;
+		_height = h;
+		_backgroundColour = bgColor;
+		_sourceBackgroundImage = bgImage;
+		setResizeFormat(resizeFormat); //To handle unknown resize formats
+		scaleBackgroundImage(_width, _height);
+	}
+	/**
 	 * Creates a new world with defined dimensions, set to be bounded or otherwise.
 	 * @param w The width to create the world with.
 	 * @param h The height to create the world with.
@@ -214,38 +249,44 @@ public abstract class World
 		_unbounded = unbounded;
 	}
 	/**
-	 * Creates a new world with defined dimensions and a background image, set to be bounded or otherwise.
+	 * Creates a new world with defined dimensions and a background image, set to be bounded or otherwise. Also supplies a resizing format.
 	 * @param w The width to create the world with.
 	 * @param h The height to create the world with.
 	 * @param bgImage The background image.
+	 * @param resizeFormat The background image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
 	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
 	 */
-	public World(int w, int h, PImage bgImage, boolean unbounded)
+	public World(int w, int h, PImage bgImage, int resizeFormat, boolean unbounded)
 	{
 		init();
 		_width = w;
 		_height = h;
 		_sourceBackgroundImage = bgImage;
-		scaleBackgroundImage(_width, _height);
+		setResizeFormat(resizeFormat); //To handle unknown resize formats
 		_unbounded = unbounded;
+		scaleBackgroundImage(_width, _height);
 	}
 	/**
-	 * Creates a new world with defined dimensions and a background image with a background colour to draw underneath, set to be bounded or otherwise.
+	 * Creates a new world with defined dimensions and a background image with a background colour to draw underneath, set to be bounded or otherwise. Also supplies a resizing format.
 	 * @param w The width to create the world with.
 	 * @param h The height to create the world with.
 	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
 	 * @param bgImage The background image.
+	 * @param resizeFormat The background image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
 	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied. 
 	 */
-	public World(int w, int h, int bgColor, PImage bgImage, boolean unbounded)
+	public World(int w, int h, int bgColor, PImage bgImage, int resizeFormat, boolean unbounded)
 	{
 		init();
 		_width = w;
 		_height = h;
 		_backgroundColour = bgColor;
 		_sourceBackgroundImage = bgImage;
-		scaleBackgroundImage(_width, _height);
+		setResizeFormat(resizeFormat); //To handle unknown resize formats
 		_unbounded = unbounded;
+		scaleBackgroundImage(_width, _height);
 	}
 	private void init()
 	{
@@ -255,10 +296,21 @@ public abstract class World
 	}
 	private void scaleBackgroundImage(int w, int h)
 	{
-		_backgroundImage = _sourceBackgroundImage.get();
-		if(_sourceBackgroundImage.width == w && _sourceBackgroundImage.height == h)
-			return;
-		_backgroundImage.resize(w, h);
+		if (_resizeFormat == Green.BILINEAR)
+		{
+			_backgroundImage = _sourceBackgroundImage.get();
+			if(_sourceBackgroundImage.width == w && _sourceBackgroundImage.height == h)
+				return;
+			_backgroundImage.resize(w, h);
+		}
+		else if (_resizeFormat == Green.NEAREST_NEIGHBOR)
+		{
+			_backgroundImage = green.resizeNN(_sourceBackgroundImage, w, h);
+		}
+		else if (_resizeFormat == Green.TILE)
+		{
+			_backgroundImage = green.tileImage(_sourceBackgroundImage, w, h);
+		}
 	}
 	
 	//Object class overrides
@@ -376,6 +428,14 @@ public abstract class World
 	public final Actor getCamFollowActor()
 	{
 		return _camFollowActor;
+	}
+	/**
+	 * Retrieves the background image resize format of the {@link World}.
+	 * @return The background image resize format - either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 */
+	public final int getResizeFormat()
+	{
+		return _resizeFormat;
 	}
 	/**
 	 * Retrieves a list of all {@link Actor} instances in the {@link World}.
@@ -525,6 +585,17 @@ public abstract class World
 	{
 		_camFollowActor = newActor;
 	}
+	/**
+	 * Sets the background image resize format of the {@link World}.
+	 * @param format The background image resize format to set. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
+	 */
+	public final void setResizeFormat(int format)
+	{
+		if(format != Green.BILINEAR && format != Green.NEAREST_NEIGHBOR && format != Green.TILE)
+			throw new UnknownResizeFormatException();
+		_resizeFormat = format;
+	}
 	
 	/**
 	 * Adds an {@link Actor} to the {@link World}.
@@ -571,6 +642,7 @@ public abstract class World
 	//Base Methods
 	/**
 	 * Calls the {@link Actor#draw()} method on every {@link Actor} in the {@link World}, drawing all objects in the {@link World} to screen.
+	 * @deprecated Please call {@link Green#handleDraw()} instead - this will still be called, but the parent method does additional important things.
 	 */
 	public final void handleDraw()
 	{
@@ -631,12 +703,11 @@ public abstract class World
 	}
 	/**
 	 * Calls the {@link Actor#act(float)} method on every {@link Actor} in the {@link World}.
+	 * @deprecated Please call {@link Green#handleAct()} instead - this will still be called, but the parent method does additional important things.
 	 */
 	public final void handleAct()
 	{
-		long currentMillis = app.millis();
-		float deltaTime = (currentMillis - _lastMillis) / 1000f;
-		_lastMillis = currentMillis;
+		float deltaTime = green.getDeltaTime();
 		act(deltaTime);
 		for(int i = _actors.size() - 1; i >= 0; i--) //for(Actor actor : _actors) <- This cannot be used here because if removeObject() is used within an act(), a ConcurrentModificationException is thrown
 			_actors.get(i).act(deltaTime);
