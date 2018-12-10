@@ -364,6 +364,7 @@ public final class Green
 	 * @param mouseY The mouse's Y-axis position, in pixels. Please pass in {@link PApplet#mouseY} in your code.
 	 * @deprecated Please use {@link #handleMousePosition(int, int, int, int)} instead.
 	 */
+	@Deprecated
 	public final void handleMousePosition(int mouseX, int mouseY)
 	{
 		_pmouseX = _mouseX;
