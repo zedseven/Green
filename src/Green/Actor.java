@@ -292,14 +292,14 @@ public abstract class Actor
 	 * @return The world this {@link Actor} is a part of that is currently loaded.
 	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
-	public final World getWorld() throws NoWorldException
+	private final World getWorldUnsafe() throws NoWorldException
 	{
 		World currentWorld = Green.getWorld();
 		if(currentWorld.hasObject(this))
 			return currentWorld;
 		throw new NoWorldException();
 	}
-	private final World getWorldSafe()
+	public final World getWorld()
 	{
 		World currentWorld = Green.getWorld();
 		if(currentWorld.hasObject(this))
@@ -328,7 +328,7 @@ public abstract class Actor
 	 */
 	public final void setX(float x)
 	{
-		World world = getWorldSafe();
+		World world = getWorld();
 		if(world != null && !world.getUnbounded())
 			_x = Math.max(0, Math.min(world.getWidth(), x));
 		else
@@ -340,7 +340,7 @@ public abstract class Actor
 	 */
 	public final void setY(float y)
 	{
-		World world = getWorldSafe();
+		World world = getWorld();
 		if(world != null && !world.getUnbounded())
 			_y = Math.max(0, Math.min(world.getHeight(), y));
 		else
@@ -361,7 +361,7 @@ public abstract class Actor
 	 */
 	public final void setLocation(float x, float y)
 	{
-		World world = getWorldSafe();
+		World world = getWorld();
 		if(world != null && !world.getUnbounded())
 		{
 			_x = Math.max(0, Math.min(world.getWidth(), x));
@@ -474,7 +474,7 @@ public abstract class Actor
 	 */
 	public final boolean isAtEdge() throws NoWorldException
 	{
-		World world = getWorld();
+		World world = getWorldUnsafe();
 		return (_x <= 0 || _x >= world.getWidth() || _y <= 0 || _y >= world.getHeight());
 	}
 	/**
@@ -535,6 +535,30 @@ public abstract class Actor
 			);
 	}
 	/**
+	 * Checks to see if a point defined by {@code pX} and {@code pY} is within the {@link Actor}'s rotated rect.
+	 * @param pX The X-axis coordinate of the point to check.
+	 * @param pY The Y-axis coordinate of the point to check.
+	 * @return Whether or not the point is within the bounds of the {@link Actor}.
+	 */
+	public final boolean pointInBounds(float pX, float pY)
+	{
+		float rotSin = sin(_rotation);
+		float rotCos = cos(_rotation);
+		float edgeX = _width / 2f;
+		float edgeY = _height / 2f;
+		
+		float cRDX = (edgeX * rotCos - edgeY * rotSin) + _x;
+		float cRDY = (edgeX * rotSin + edgeY * rotCos) + _y;
+		float cLDX = (-edgeX * rotCos - edgeY * rotSin) + _x;
+		float cLDY = (-edgeX * rotSin + edgeY * rotCos) + _y;
+		float cRUX = (edgeX * rotCos + edgeY * rotSin) + _x;
+		float cRUY = (edgeX * rotSin - edgeY * rotCos) + _y;
+		float cLUX = (-edgeX * rotCos + edgeY * rotSin) + _x;
+		float cLUY = (-edgeX * rotSin - edgeY * rotCos) + _y;
+		
+		return Green.pointInRectangle(cLUX, cLUY, cRUX, cRUY, cRDX, cRDY, cLDX, cLDY, pX, pY);
+	}
+	/**
 	 * Retrieves a list of all objects matching {@code type} in the {@link World} that intersect with the {@link Actor}, using basic rect comparison.
 	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
 	 * @param type The type of other {@link Actor} to compare against.
@@ -543,7 +567,7 @@ public abstract class Actor
 	 */
 	public final <A extends Actor> List<A> getIntersectingObjects(Class<A> type) throws NoWorldException //Compares rects of images
 	{
-		World world = getWorld();
+		World world = getWorldUnsafe();
 		List<A> actors = world.getObjects(type);
 		List<A> retList = new ArrayList<A>();
 		for(A actor : actors)
@@ -560,7 +584,7 @@ public abstract class Actor
 	 */
 	public final <A extends Actor> A getOneIntersectingObject(Class<A> type) throws NoWorldException //Compares rects of images
 	{
-		World world = getWorld();
+		World world = getWorldUnsafe();
 		List<A> actors = world.getObjects(type);
 		for(A actor : actors)
 			if(intersects(actor))
@@ -579,7 +603,7 @@ public abstract class Actor
 	 */
 	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type, float range) throws NoWorldException
 	{
-		World world = getWorld();
+		World world = getWorldUnsafe();
 		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
 		List<A> retList = new ArrayList<A>();
@@ -615,7 +639,7 @@ public abstract class Actor
 	 */
 	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type, float range) throws NoWorldException
 	{
-		World world = getWorld();
+		World world = getWorldUnsafe();
 		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
 		float tX = getX() + oX;
@@ -648,7 +672,7 @@ public abstract class Actor
 	 */
 	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type) throws NoWorldException
 	{
-		World world = getWorld();
+		World world = getWorldUnsafe();
 		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
 		List<A> retList = new ArrayList<A>();
@@ -667,7 +691,7 @@ public abstract class Actor
 	 */
 	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type) throws NoWorldException
 	{
-		World world = getWorld();
+		World world = getWorldUnsafe();
 		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
 		for(A actor : actors)
@@ -706,6 +730,43 @@ public abstract class Actor
 	{
 		if(obj == this || (obj.getX() == _x && obj.getY() == _y)) return; //Because it is impossible to turn towards where you already are
 		_rotation = atan2(obj.getY() - _y, obj.getX() - _x);
+	}
+	
+	//Mouse Methods
+	/**
+	 * Retrieves whether or not a specific mouse button is currently down on this {@link Actor}.
+	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
+	 * @return Whether or not {@code mouseButton} is down.
+	 */
+	public final boolean isMouseButtonDownHere(int mouseButton)
+	{
+		return green.isMouseButtonDown(mouseButton) && pointInBounds(app.mouseX, app.mouseY);
+	}
+	/**
+	 * Retrieves whether or not a specific mouse button was pressed this frame on this {@link Actor}.
+	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
+	 * @return Whether or not {@code mouseButton} was pressed in this frame.
+	 */
+	public final boolean isMouseButtonDownThisFrameHere(int mouseButton)
+	{
+		return green.isMouseButtonDownThisFrame(mouseButton) && pointInBounds(app.mouseX, app.mouseY);
+	}
+	/**
+	 * Retrieves whether or not a specific mouse button was released this frame on this {@link Actor}.
+	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
+	 * @return Whether or not {@code mouseButton} was released in this frame.
+	 */
+	public final boolean isMouseButtonUpThisFrameHere(int mouseButton)
+	{
+		return green.isMouseButtonUpThisFrame(mouseButton) && pointInBounds(app.mouseX, app.mouseY);
+	}
+	/**
+	 * Retrieves whether or not the mouse is currently scrolling on this {@link Actor}.
+	 * @return Whether or not the mouse is currently scrolling.
+	 */
+	public final boolean isMouseScrollingHere()
+	{
+		return green.isMouseScrolling() && pointInBounds(app.mouseX, app.mouseY);
 	}
 	
 	//Base Methods

@@ -249,6 +249,23 @@ public abstract class World
 		_unbounded = unbounded;
 	}
 	/**
+	 * Creates a new world with defined dimensions and a background image, set to be bounded or otherwise.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgImage The background image.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
+	 */
+	public World(int w, int h, PImage bgImage, boolean unbounded)
+	{
+		init();
+		_width = w;
+		_height = h;
+		_sourceBackgroundImage = bgImage;
+		_unbounded = unbounded;
+		scaleBackgroundImage(_width, _height);
+	}
+	/**
 	 * Creates a new world with defined dimensions and a background image, set to be bounded or otherwise. Also supplies a resizing format.
 	 * @param w The width to create the world with.
 	 * @param h The height to create the world with.
@@ -264,6 +281,25 @@ public abstract class World
 		_height = h;
 		_sourceBackgroundImage = bgImage;
 		setResizeFormat(resizeFormat); //To handle unknown resize formats
+		_unbounded = unbounded;
+		scaleBackgroundImage(_width, _height);
+	}
+	/**
+	 * Creates a new world with defined dimensions and a background image with a background colour to draw underneath, set to be bounded or otherwise.
+	 * @param w The width to create the world with.
+	 * @param h The height to create the world with.
+	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
+	 * @param bgImage The background image.
+	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied. 
+	 */
+	public World(int w, int h, int bgColor, PImage bgImage, boolean unbounded)
+	{
+		init();
+		_width = w;
+		_height = h;
+		_backgroundColour = bgColor;
+		_sourceBackgroundImage = bgImage;
 		_unbounded = unbounded;
 		scaleBackgroundImage(_width, _height);
 	}

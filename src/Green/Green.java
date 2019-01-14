@@ -269,12 +269,35 @@ public final class Green
 		
 		PImage img = parent.createImage(w, h, src.format); //Create a temporary image with the same pixel format as the source
 		
-		int tW = (int) Math.ceil(w / src.width) + 1, tH = (int) Math.ceil(h / src.height) + 1;
+		int tW = (int) Math.ceil(w / src.width) + 1, tH = (int) Math.ceil((float) h / src.height) + 1;
 		for (int y = 0; y < tH; y++)
 			for (int x = 0; x < tW; x++)
 				img.set(x * src.width, y * src.height, src);
 		
 		return img;
+	}
+	private static float isLeft(float p0x, float p0y, float p1x, float p1y, float p2x, float p2y)
+	{
+	    return ((p1x - p0x) * (p2y - p0y) - (p2x - p0x) * (p1y - p0y));
+	}
+	/**
+	 * Checks whether a point ({@code pPx}, {@code pPy}) is within the bounds of a rectangle (({@code pXx}, {@code pXy}), ({@code pYx}, {@code pYy}), ({@code pZx}, {@code pZy}), ({@code pWx}, {@code pWy})) where the points are provided in clockwise order.
+	 * @param pXx The X-axis position of the X point.
+	 * @param pXy The Y-axis position of the X point.
+	 * @param pYx The X-axis position of the Y point.
+	 * @param pYy The Y-axis position of the Y point.
+	 * @param pZx The X-axis position of the Z point.
+	 * @param pZy The Y-axis position of the Z point.
+	 * @param pWx The X-axis position of the W point.
+	 * @param pWy The Y-axis position of the W point.
+	 * @param pPx The X-axis position of the point to check.
+	 * @param pPy The Y-axis position of the point to check.
+	 * @return Whether the point to check is within the bounds of the provided rectangle.
+	 * @see <a href="https://gamedev.stackexchange.com/a/110233">https://gamedev.stackexchange.com/a/110233</a>
+	 */
+	public static boolean pointInRectangle(float pXx, float pXy, float pYx, float pYy, float pZx, float pZy, float pWx, float pWy, float pPx, float pPy)
+	{
+	    return (isLeft(pXx, pXy, pYx, pYy, pPx, pPy) > 0 && isLeft(pYx, pYy, pZx, pZy, pPx, pXy) > 0 && isLeft(pZx, pZy, pWx, pWy, pPx, pPy) > 0 && isLeft(pWx, pWy, pXx, pXy, pPx, pPy) > 0);
 	}
 	
 	//Base Methods
