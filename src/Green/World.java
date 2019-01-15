@@ -25,9 +25,11 @@ public abstract class World
 	private boolean _unbounded = false;
 	private boolean _onlyDrawOnScreen = true;
 	private int _resizeFormat = Green.TILE;
+	private boolean _actorUnsafeRemove = false; //Mode for removing actors from the world safely or otherwise. In some small cases this may be necessary.
 	
 	private List<Actor> _actors = new ArrayList<Actor>();
 	private Actor _camFollowActor = null;
+	private List<Actor> _actorRemoveQueue = new ArrayList<Actor>();
 	
 	//Constructors
 	/**
@@ -466,6 +468,14 @@ public abstract class World
 		return _camFollowActor;
 	}
 	/**
+	 * Retrieves the current setting for whether the {@link World} should remove {@link Actor} instances safely.
+	 * @return The current setting for whether the {@link World} should remove {@link Actor} instances safely.
+	 */
+	public final boolean getActorUnsafeRemove()
+	{
+		return _actorUnsafeRemove;
+	}
+	/**
 	 * Retrieves the background image resize format of the {@link World}.
 	 * @return The background image resize format - either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
 	 */
@@ -622,6 +632,15 @@ public abstract class World
 		_camFollowActor = newActor;
 	}
 	/**
+	 * Sets whether or not the {@link World} should remove {@link Actor} instances safely. In some niche cases it may be handy to set this to {@code true}, but only if you know what you are doing. 
+	 * @param unsafeRemove Whether or not the {@link World} should remove {@link Actor} instances safely.
+	 */
+	public final void setActorUnsafeRemove(boolean unsafeRemove)
+	{
+		_actorUnsafeRemove = unsafeRemove;
+		FlushActorRemoveQueue();
+	}
+	/**
 	 * Sets the background image resize format of the {@link World}.
 	 * @param format The background image resize format to set. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
 	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
@@ -643,7 +662,7 @@ public abstract class World
 		obj.addedToWorld(this);
 	}
 	/**
-	 * Removes an {@link Actor} from the {@link World}.
+	 * Removes an {@link Actor} from the {@link World}. It either removes it right away (unsafe) or waits to remove it at the end of the frame (safe) based on the value set by {@link World#setActorUnsafeRemove(boolean)}. The default value is safe.
 	 * @param obj The {@link Actor} to remove from the {@link World}.
 	 * @throws IllegalArgumentException Thrown when {@code obj} is not in the {@link World}.
 	 */
@@ -651,8 +670,15 @@ public abstract class World
 	{
 		try
 		{
-			_actors.remove(obj);
-			obj.removedFromWorld(this);
+			if(_actorUnsafeRemove)
+			{
+				_actors.remove(obj);
+				obj.removedFromWorld(this);
+			}
+			else
+			{
+				_actorRemoveQueue.add(obj);
+			}
 		}
 		catch(Exception e)
 		{
@@ -673,6 +699,16 @@ public abstract class World
 			if(actor.equals(findActor))
 				return true;
 		return false;
+	}
+	
+	//Functional Methods
+	private void FlushActorRemoveQueue()
+	{
+		for(Actor actor : _actorRemoveQueue)
+		{
+			_actors.remove(actor);
+			actor.removedFromWorld(this);
+		}
 	}
 	
 	//Base Methods
@@ -747,6 +783,7 @@ public abstract class World
 		act(deltaTime);
 		for(int i = _actors.size() - 1; i >= 0; i--) //for(Actor actor : _actors) <- This cannot be used here because if removeObject() is used within an act(), a ConcurrentModificationException is thrown
 			_actors.get(i).act(deltaTime);
+		FlushActorRemoveQueue();
 	}
 	
 	/**
