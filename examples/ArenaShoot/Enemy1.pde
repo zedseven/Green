@@ -20,7 +20,7 @@ class Enemy1 extends Actor
   //Construct the actor at the start of the program
   public Enemy1(EnemySide side, World world)
   {
-    super(0, 0, loadImage("enemy1L.png"), 2f);
+    super(0, 0, loadImage("Sprites/enemy1L.png"), 2f);
     green = Green.getInstance();
     anchorSide = side;
     float randomMultiplier = random(0f, 1f);

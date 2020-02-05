@@ -89,3 +89,4 @@ local.properties
 distribution/*
 .project
 .classpath
+core.jar

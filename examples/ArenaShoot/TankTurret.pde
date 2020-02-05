@@ -3,9 +3,9 @@ class TankTurret extends Actor
   //Configuration variables
   int shootSpeed = 500; //Every 500 milliseconds
   PImage baseImage = null;
-  PImage poweredImage = loadImage("playerBlasterLPowerUppedL.png");
-  PImage shieldedImage = loadImage("shieldedPlayerBlasterL.png");
-  PImage poweredShieldedImage = loadImage("shieldedPlayerBlasterLPowerUppedL.png");
+  PImage poweredImage = loadImage("Sprites/playerBlasterLPowerUppedL.png");
+  PImage shieldedImage = loadImage("Sprites/shieldedPlayerBlasterL.png");
+  PImage poweredShieldedImage = loadImage("Sprites/shieldedPlayerBlasterLPowerUppedL.png");
   //Runtime variables
   Green green;
   TankBase player;
@@ -16,7 +16,7 @@ class TankTurret extends Actor
   //Construct the actor at the start of the program
   public TankTurret()
   {
-    super(0, 0, loadImage("playerBlasterL.png"), 2.5f);
+    super(0, 0, loadImage("Sprites/playerBlasterL.png"), 2.5f);
     baseImage = getSourceImage();
     green = Green.getInstance();
     setZ(2); //Draw over the tank base

@@ -19,7 +19,7 @@ class Enemy2 extends Actor
   //Construct the actor at the start of the program
   public Enemy2(float x, float y)
   {
-    super(x, y, loadImage("enemy2.png"), 2.5f);
+    super(x, y, loadImage("Sprites/enemy2.png"), 2.5f);
     green = Green.getInstance();
     setZ(3); //Draw over everything else
   }

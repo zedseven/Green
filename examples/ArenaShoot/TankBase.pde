@@ -7,7 +7,7 @@ class TankBase extends Actor
   float moveSpeed = 2f;
   float turnSpeed = 1f;
   PImage baseImage = null;
-  PImage shieldedImage = loadImage("shieldedPlayerBase.png");
+  PImage shieldedImage = loadImage("Sprites/shieldedPlayerBase.png");
   //Runtime variables
   Green green;
   TankTurret turret = null;
@@ -21,7 +21,7 @@ class TankBase extends Actor
   //Construct the actor at the start of the program
   public TankBase(float x, float y)
   {
-    super(x, y, loadImage("playerBase.png"), 2.5f);
+    super(x, y, loadImage("Sprites/playerBase.png"), 2.5f);
     baseImage = getSourceImage();
     green = Green.getInstance();
   }

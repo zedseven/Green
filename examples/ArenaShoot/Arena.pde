@@ -61,7 +61,7 @@ class Arena extends World
   //Construct the world at the start of the program
   public Arena(int w, int h)
   {
-    super(w, h, loadImage("ground.png"));
+    super(w, h, loadImage("Sprites/ground.png"));
   }
   //Run once when the world is loaded
   public void prepare()

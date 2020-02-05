@@ -10,7 +10,7 @@ class Enemy3Laser extends Actor
   //Construct the actor at the start of the program
   public Enemy3Laser(float x, float y)
   {
-    super(x, y, loadImage("laser3Rf.png"), 1.85f);
+    super(x, y, loadImage("Sprites/laser3Rf.png"), 1.85f);
     green = Green.getInstance();
   }
   //Called when this is added to a world

@@ -11,7 +11,7 @@ class Enemy3 extends Actor
   //Construct the actor at the start of the program
   public Enemy3(float x, float y)
   {
-    super(x, y, loadImage("enemy3.png"), 2.5f);
+    super(x, y, loadImage("Sprites/enemy3.png"), 2.5f);
     green = Green.getInstance();
   }
   //Run every frame

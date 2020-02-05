@@ -12,3 +12,10 @@ From there, select `Sketch > Import Library...` in the editor, and Green should 
 
 ## Reference
 To see the Javadoc reference, please visit [https://zedseven.github.io/Green/](https://zedseven.github.io/Green/).
+
+## A brief run-down
+The library works with two basic classes: `Worlds` and `Actors`.
+
+The `World` class is where all the interaction and gameplay takes place - it's where all the `Actors` live, and for most games one `World` is enough.
+
+The `Actor` class is where all the per-item code goes: you might have a player `Actor`, one for an item the player can pick up, and maybe a few ones for obstacles.

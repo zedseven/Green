@@ -14,9 +14,9 @@ class PlayerLaser extends Actor
     super(x, y, 37, 14); //1.85f scale
     poweredUp = powered;
     if(!powered)
-      setImage(loadImage("laser1Rf.png"));
+      setImage(loadImage("Sprites/laser1Rf.png"));
     else
-      setImage(loadImage("lPowerUppedLaser1Rf.png"));
+      setImage(loadImage("Sprites/lPowerUppedLaser1Rf.png"));
     green = Green.getInstance();
   }
   //Called when this is added to a world

@@ -6,7 +6,7 @@ class LaserPowerup extends Actor
   //Construct the actor at the start of the program
   public LaserPowerup(float x, float y)
   {
-    super(x, y, loadImage("powerUpLaserRf.png"), 1.875f);
+    super(x, y, loadImage("Sprites/powerUpLaserRf.png"), 1.875f);
   }
   //Run every frame
   public void act(float deltaTime)

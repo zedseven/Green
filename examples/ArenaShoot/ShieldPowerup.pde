@@ -6,7 +6,7 @@ class ShieldPowerup extends Actor
   //Construct the actor at the start of the program
   public ShieldPowerup(float x, float y)
   {
-    super(x, y, loadImage("powerUpShieldRf.png"), 1.875f);
+    super(x, y, loadImage("Sprites/powerUpShieldRf.png"), 1.875f);
   }
   //Run every frame
   public void act(float deltaTime)
