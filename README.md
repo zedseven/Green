@@ -1,4 +1,6 @@
 # Green
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 #### A library for Processing written by Zacchary Dempsey-Plante
 This is a relatively simple library designed to emulate most of the features of [Greenfoot](https://www.greenfoot.org/) in [Processing](https://processing.org/).
 This was done for a school project and aims to enable easy 2D game creation within Processing.
