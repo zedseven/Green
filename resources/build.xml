@@ -312,7 +312,7 @@ ${line}
 		        
 		<zip destfile="${project.dist.version}/${project.name}.zip"
   	       basedir="${project.dist.version}/tmp"
-  	       excludes="**/.DS_Store"
+  	       excludes="**/.DS_Store,**/*.class,**/core.jar,**/.classpath,**/.project"
 		/>
 		
         <move file="${project.dist.version}/${project.name}.zip" todir="${project.dist.version}/web/download" />

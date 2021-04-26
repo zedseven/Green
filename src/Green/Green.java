@@ -24,6 +24,7 @@ public final class Green
 	private PApplet parent;
 	
 	private static World _currentWorld;
+	private static World _worldToLoad;
 	
 	private long _lastMillis = 0;
 	private float _deltaTime = 0; //I don't like storing a dynamic variable like this, but it has to be stored so that calls to getDeltaTime() are consistent within frames
@@ -305,11 +306,22 @@ public final class Green
 	 * Loads a {@link World} to make it the one currently in use.
 	 * @param world The {@link World} to load.
 	 */
-	public void loadWorld(World world)
+	private void loadWorldUnsafe(World world)
 	{
 		_currentWorld = world;
 		//parent.setSize(world.getWidth(), world.getHeight());
 		world.prepare();
+	}
+	/**
+	 * Loads a {@link World} to make it the one currently in use. If there is a world already loaded, the new one will only be loaded at the end of the current frame.
+	 * @param world The {@link World} to load.
+	 */
+	public void loadWorld(World world)
+	{
+		if(_currentWorld == null)
+			loadWorldUnsafe(world);
+		else
+			_worldToLoad = world;
 	}
 	/**
 	 * Calls the {@link Actor#draw()} method on every {@link Actor}, drawing all objects in the currently-loaded {@link World} to screen.
@@ -333,6 +345,11 @@ public final class Green
 		World world = getWorld();
 		if(world == null) throw new NoWorldException();
 		world.handleAct();
+		if(_worldToLoad != null)
+		{
+            loadWorldUnsafe(_worldToLoad);
+            _worldToLoad = null;
+        }
 	}
 	//Input
 	/**
@@ -467,7 +484,7 @@ public final class Green
 	/**
 	 * Handles the event of a key being pressed. Put this in the {@link PApplet#keyPressed()} event.
 	 * @param key The {@code char} representation of the key that was pressed. Please pass in {@link PApplet#key} in your code.
-	 * @param keyCode They key code of the key that was pressed. Please pass in {@link PApplet#keyCode} in your code.
+	 * @param keyCode The key code of the key that was pressed. Please pass in {@link PApplet#keyCode} in your code.
 	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
 	public final void handleKeyDown(char key, int keyCode)
@@ -480,7 +497,7 @@ public final class Green
 	/**
 	 * Handles the event of a key being released. Put this in the {@link PApplet#keyReleased()} event.
 	 * @param key The {@code char} representation of the key that was released. Please pass in {@link PApplet#key} in your code.
-	 * @param keyCode They key code of the key that was released. Please pass in {@link PApplet#keyCode} in your code.
+	 * @param keyCode The key code of the key that was released. Please pass in {@link PApplet#keyCode} in your code.
 	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
 	public final void handleKeyUp(char key, int keyCode)

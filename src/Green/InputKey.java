@@ -1,7 +1,7 @@
 package Green;
 
 /**
- * A class for storing a key input for (primarily-internal) use. It stores both the {@code char} {@code key} and the {@code int} {@code keyCode} of the input.
+ * A class for storing a key input for (primarily internal) use. It stores both the {@code char} {@code key} and the {@code int} {@code keyCode} of the input.
  * @author Zacchary Dempsey-Plante
  */
 public class InputKey

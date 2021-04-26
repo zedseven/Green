@@ -469,7 +469,7 @@ public abstract class Actor
 	//Utility Functions
 	/**
 	 * Checks to see if the {@link Actor} is at the edge of the {@link World} it is currently in.
-	 * @return Whether the {@link Actor} is at the edge of it's {@link World}, or false if not in one.
+	 * @return Whether the {@link Actor} is at the edge of it's {@link World}.
 	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
 	public final boolean isAtEdge() throws NoWorldException
