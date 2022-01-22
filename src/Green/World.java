@@ -709,6 +709,7 @@ public abstract class World
 			_actors.remove(actor);
 			actor.removedFromWorld(this);
 		}
+		_actorRemoveQueue.clear();//clear the queue after removing the actors
 	}
 	
 	//Base Methods
