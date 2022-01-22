@@ -21,8 +21,8 @@ public class InputKey
 	}
 	
 	/**
-	 * Retrieves the {@code char} representation of the key that was pressed (or {@link processing.core.PConstants#CODED} if the key doesn't have one.
-	 * @return The {@code char} representation of the key that was pressed (or {@link processing.core.PConstants#CODED} if the key doesn't have one.
+	 * Retrieves the {@code char} representation of the key that was pressed (or {@link processing.core.PConstants#CODED} if the key doesn't have one)
+	 * @return The {@code char} representation of the key that was pressed (or {@link processing.core.PConstants#CODED} if the key doesn't have one)
 	 */
 	public char getKey()
 	{
@@ -60,9 +60,7 @@ public class InputKey
 		InputKey other = (InputKey) obj;
 		if(_key != other._key)
 			return false;
-		if(_keyCode != other._keyCode)
-			return false;
-		return true;
+		return _keyCode == other._keyCode;
 	}
 	@Override
 	public String toString()

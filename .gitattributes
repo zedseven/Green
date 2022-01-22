@@ -1,6 +1,5 @@
-data/* linguist-vendored
 distribution/reference/* linguist-documentation
-distribution/* linguist-vendored
-lib/* linguist-vendored
-resources/* linguist-vendored
-web/* linguist-vendored
+distribution/*           linguist-generated
+resources/*              linguist-vendored
+web/*                    linguist-vendored
+*.pde                    linguist-detectable=true

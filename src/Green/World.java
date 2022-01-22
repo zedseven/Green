@@ -5,7 +5,7 @@ import processing.core.*;
 import static processing.core.PApplet.floor;
 
 /**
- * The base class for all worlds in the library. A world is it's own area for a collection of {@link Actor} instances to interact in, though any given {@link Actor} can be within multiple worlds at a time.
+ * The base class for all worlds in the library. A world is its own area for a collection of {@link Actor} instances to interact in, though any given {@link Actor} can be within multiple worlds at a time.
  * Only one world may be active at a time however, which can be changed by calling {@link Green#loadWorld(World)}.
  * @author Zacchary Dempsey-Plante
  */
@@ -18,7 +18,7 @@ public abstract class World
 	private int _width;
 	private int _height;
 	
-	private int _backgroundColour = -1;//app.color(255, 255, 255);
+	private int _backgroundColour = -1; //app.color(255, 255, 255);
 	private int _outOfBoundsColour = -16777216;
 	private PImage _sourceBackgroundImage = null;
 	private PImage _backgroundImage = null;
@@ -27,9 +27,9 @@ public abstract class World
 	private int _resizeFormat = Green.TILE;
 	private boolean _actorUnsafeRemove = false; //Mode for removing actors from the world safely or otherwise. In some small cases this may be necessary.
 	
-	private List<Actor> _actors = new ArrayList<Actor>();
+	private final List<Actor> _actors = new ArrayList<>();
 	private Actor _camFollowActor = null;
-	private List<Actor> _actorRemoveQueue = new ArrayList<Actor>();
+	private final List<Actor> _actorRemoveQueue = new ArrayList<>();
 	
 	//Constructors
 	/**
@@ -80,7 +80,7 @@ public abstract class World
 	}
 	/**
 	 * Creates a new world using the screen dimensions, set to be bounded or otherwise.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 */
 	public World(boolean unbounded)
 	{
@@ -92,7 +92,7 @@ public abstract class World
 	/**
 	 * Creates a new world using the screen dimensions with a background colour, set to be bounded or otherwise.
 	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 */
 	public World(int bgColor, boolean unbounded)
 	{
@@ -105,7 +105,7 @@ public abstract class World
 	/**
 	 * Creates a new world using the screen dimensions with a background image, set to be bounded or otherwise.
 	 * @param bgImage The background image.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 */
 	public World(PImage bgImage, boolean unbounded)
 	{
@@ -120,7 +120,7 @@ public abstract class World
 	 * Creates a new world using the screen dimensions with a background image and a background colour to draw underneath, set to be bounded or otherwise.
 	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
 	 * @param bgImage The background image.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 */
 	public World(int bgColor, PImage bgImage, boolean unbounded)
 	{
@@ -226,7 +226,7 @@ public abstract class World
 	 * Creates a new world with defined dimensions, set to be bounded or otherwise.
 	 * @param w The width to create the world with.
 	 * @param h The height to create the world with.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 */
 	public World(int w, int h, boolean unbounded)
 	{
@@ -240,7 +240,7 @@ public abstract class World
 	 * @param w The width to create the world with.
 	 * @param h The height to create the world with.
 	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 */
 	public World(int w, int h, int bgColor, boolean unbounded)
 	{
@@ -255,7 +255,7 @@ public abstract class World
 	 * @param w The width to create the world with.
 	 * @param h The height to create the world with.
 	 * @param bgImage The background image.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
 	 */
 	public World(int w, int h, PImage bgImage, boolean unbounded)
@@ -273,7 +273,7 @@ public abstract class World
 	 * @param h The height to create the world with.
 	 * @param bgImage The background image.
 	 * @param resizeFormat The background image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied.
 	 */
 	public World(int w, int h, PImage bgImage, int resizeFormat, boolean unbounded)
@@ -292,7 +292,7 @@ public abstract class World
 	 * @param h The height to create the world with.
 	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
 	 * @param bgImage The background image.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied. 
 	 */
 	public World(int w, int h, int bgColor, PImage bgImage, boolean unbounded)
@@ -312,7 +312,7 @@ public abstract class World
 	 * @param bgColor The background colour. Use the {@link processing.core.PApplet#color(int, int, int)} method to define it.
 	 * @param bgImage The background image.
 	 * @param resizeFormat The background image resize format to use. It must be either {@link Green#BILINEAR}, {@link Green#NEAREST_NEIGHBOR}, or {@link Green#TILE}.
-	 * @param unbounded Whether or not {@link Actor} instances should be able to go out of bounds.
+	 * @param unbounded Whether {@link Actor} instances should be able to go out of bounds.
 	 * @throws UnknownResizeFormatException Thrown when an unknown resize format is supplied. 
 	 */
 	public World(int w, int h, int bgColor, PImage bgImage, int resizeFormat, boolean unbounded)
@@ -371,13 +371,8 @@ public abstract class World
 			return false;
 		World other = (World) obj;
 		if(uuid == null)
-		{
-			if (other.uuid != null)
-				return false;
-		}
-		else if(!uuid.equals(other.uuid))
-			return false;
-		return true;
+			return other.uuid == null;
+		else return uuid.equals(other.uuid);
 	}
 	@Override
 	public String toString()
@@ -443,17 +438,17 @@ public abstract class World
 		return _outOfBoundsColour;
 	}
 	/**
-	 * Retrieves whether or not the {@link World} has 'collideable' boundaries that prevent {@link Actor} instances from going out-of-bounds.
-	 * @return Whether or not the {@link World} has 'collideable' boundaries.
+	 * Retrieves whether the {@link World} has 'collidable' boundaries that prevent {@link Actor} instances from going out-of-bounds.
+	 * @return Whether the {@link World} has 'collidable' boundaries.
 	 */
 	public final boolean getUnbounded()
 	{
 		return _unbounded;
 	}
 	/**
-	 * Retrieves whether or not the {@link World} should attempt to render {@link Actor} instances that are not on-screen. In normal use, there shouldn't be a reason for this to be modified.
+	 * Retrieves whether the {@link World} should attempt to render {@link Actor} instances that are not on-screen. In normal use, there shouldn't be a reason for this to be modified.
 	 * By default, the {@link World} does not render things that aren't on-screen.
-	 * @return Whether or not the {@link World} attempts to render {@link Actor} instances that are not on-screen.
+	 * @return Whether the {@link World} attempts to render {@link Actor} instances that are not on-screen.
 	 */
 	public final boolean getOnlyDrawOnScreen()
 	{
@@ -499,10 +494,10 @@ public abstract class World
 	 */
 	public final <A extends Actor> List<A> getObjects(Class<A> type)
 	{
-		List<A> retList = new ArrayList<A>();
-		for(int i = 0; i < _actors.size(); i++)
-			if(type.isInstance(_actors.get(i)))
-				retList.add((A) _actors.get(i));
+		List<A> retList = new ArrayList<>();
+		for (Actor actor : _actors)
+			if (type.isInstance(actor))
+				retList.add((A) actor);
 		return retList;
 	}
 	/**
@@ -521,7 +516,7 @@ public abstract class World
 	
 	//Setters
 	/**
-	 * Sets the width of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether or not {@link #setUnbounded(boolean)} has been used, etc.
+	 * Sets the width of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether {@link #setUnbounded(boolean)} has been used, etc.
 	 * @param width The width to set.
 	 */
 	public final void setWidth(int width)
@@ -533,7 +528,7 @@ public abstract class World
 				actor.setLocation(actor.getX(), actor.getY());
 	}
 	/**
-	 * Sets the height of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether or not {@link #setUnbounded(boolean)} has been used, etc.
+	 * Sets the height of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether {@link #setUnbounded(boolean)} has been used, etc.
 	 * @param height The height to set.
 	 */
 	public final void setHeight(int height)
@@ -545,7 +540,7 @@ public abstract class World
 				actor.setLocation(actor.getX(), actor.getY());
 	}
 	/**
-	 * Sets the dimensions of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether or not {@link #setUnbounded(boolean)} has been used, etc.
+	 * Sets the dimensions of the {@link World}. This operation may be expensive, depending on the number of {@link Actor} instances, whether {@link #setUnbounded(boolean)} has been used, etc.
 	 * @param width The width to set.
 	 * @param height The height to set.
 	 */
@@ -604,8 +599,8 @@ public abstract class World
 		_outOfBoundsColour = app.color(newColourR, newColourG, newColourB);
 	}
 	/**
-	 * Sets whether or not the {@link World} has 'collideable' boundaries that prevent {@link Actor} instances from going out-of-bounds.
-	 * @param unbounded Whether or not the {@link World} has 'collideable' boundaries.
+	 * Sets whether the {@link World} has 'collidable' boundaries that prevent {@link Actor} instances from going out-of-bounds.
+	 * @param unbounded Whether the {@link World} has 'collidable' boundaries.
 	 */
 	public final void setUnbounded(boolean unbounded)
 	{
@@ -615,9 +610,9 @@ public abstract class World
 				actor.setLocation(actor.getX(), actor.getY());
 	}
 	/**
-	 * Sets whether or not the {@link World} should attempt to render {@link Actor} instances that are not on-screen. In normal use, there shouldn't be a reason for this to be modified.
+	 * Sets whether the {@link World} should attempt to render {@link Actor} instances that are not on-screen. In normal use, there shouldn't be a reason for this to be modified.
 	 * By default, the {@link World} does not render things that aren't on-screen.
-	 * @param onlyDrawOnScreen Whether or not the {@link World} should attempt to render {@link Actor} instances that are not on-screen.
+	 * @param onlyDrawOnScreen Whether the {@link World} should attempt to render {@link Actor} instances that are not on-screen.
 	 */
 	public final void setOnlyDrawOnScreen(boolean onlyDrawOnScreen)
 	{
@@ -632,8 +627,8 @@ public abstract class World
 		_camFollowActor = newActor;
 	}
 	/**
-	 * Sets whether or not the {@link World} should remove {@link Actor} instances safely. In some niche cases it may be handy to set this to {@code true}, but only if you know what you are doing. 
-	 * @param unsafeRemove Whether or not the {@link World} should remove {@link Actor} instances safely.
+	 * Sets whether the {@link World} should remove {@link Actor} instances safely. In some niche cases it may be handy to set this to {@code true}, but only if you know what you are doing.
+	 * @param unsafeRemove Whether the {@link World} should remove {@link Actor} instances safely.
 	 */
 	public final void setActorUnsafeRemove(boolean unsafeRemove)
 	{
@@ -688,9 +683,9 @@ public abstract class World
 	
 	//Utility Methods
 	/**
-	 * Determines whether or not the {@link World} contains {@code findActor}.
+	 * Determines whether the {@link World} contains {@code findActor}.
 	 * @param findActor The {@link Actor} to check for the existence of.
-	 * @return Whether or not the {@link World} contains {@code findActor}.
+	 * @return Whether the {@link World} contains {@code findActor}.
 	 */
 	public final boolean hasObject(Actor findActor)
 	{
@@ -709,7 +704,7 @@ public abstract class World
 			_actors.remove(actor);
 			actor.removedFromWorld(this);
 		}
-		_actorRemoveQueue.clear();//clear the queue after removing the actors
+		_actorRemoveQueue.clear();
 	}
 	
 	//Base Methods
@@ -759,7 +754,7 @@ public abstract class World
 		app.fill(-16777216); //app.color(0, 0, 0)
 		if(_backgroundImage != null)
 			app.image(_backgroundImage, 0, 0, _width, _height);
-		Collections.sort(_actors, (a1, a2) -> { return Math.round(a1.getZ() - a2.getZ()); });
+		_actors.sort((a1, a2) -> Math.round(a1.getZ() - a2.getZ()));
 		for(Actor actor : _actors)
 		{
 			if(_onlyDrawOnScreen)

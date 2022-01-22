@@ -184,13 +184,8 @@ public abstract class Actor
 			return false;
 		Actor other = (Actor) obj;
 		if(uuid == null)
-		{
-			if(other.uuid != null)
-				return false;
-		}
-		else if(!uuid.equals(other.uuid))
-			return false;
-		return true;
+			return other.uuid == null;
+		else return uuid.equals(other.uuid);
 	}
 	@Override
 	public String toString()
@@ -288,17 +283,23 @@ public abstract class Actor
 		return _resizeFormat;
 	}
 	/**
-	 * Retrieves the current {@link World} this {@link Actor} is in, or null otherwise.
-	 * @return The world this {@link Actor} is a part of that is currently loaded.
+	 * Retrieves the current {@link World} this {@link Actor} is in. This is unsafe and only used internally.
+	 * @return The world this {@link Actor} is a part of, that is currently loaded.
 	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
-	private final World getWorldUnsafe() throws NoWorldException
+	private World getWorldUnsafe() throws NoWorldException
 	{
 		World currentWorld = Green.getWorld();
+		if(currentWorld == null)
+			throw new NoWorldException();
 		if(currentWorld.hasObject(this))
 			return currentWorld;
 		throw new NoWorldException();
 	}
+	/**
+	 * Retrieves the current {@link World} this {@link Actor} is in, or null otherwise.
+	 * @return The world this {@link Actor} is a part of, that is currently loaded.
+	 */
 	public final World getWorld()
 	{
 		World currentWorld = Green.getWorld();
@@ -480,7 +481,7 @@ public abstract class Actor
 	/**
 	 * Checks to see whether the {@link Actor} intersects another {@link Actor}, using basic rect comparison.
 	 * @param actor The other {@link Actor} to check against.
-	 * @return Whether or not this {@link Actor} intersects the other, or false if the same {@link Actor} is supplied.
+	 * @return Whether this {@link Actor} intersects the other, or false if the same {@link Actor} is supplied.
 	 */
 	public final boolean intersects(Actor actor)
 	{
@@ -538,7 +539,7 @@ public abstract class Actor
 	 * Checks to see if a point defined by {@code pX} and {@code pY} is within the {@link Actor}'s rotated rect.
 	 * @param pX The X-axis coordinate of the point to check.
 	 * @param pY The Y-axis coordinate of the point to check.
-	 * @return Whether or not the point is within the bounds of the {@link Actor}.
+	 * @return Whether the point is within the bounds of the {@link Actor}.
 	 */
 	public final boolean pointInBounds(float pX, float pY)
 	{
@@ -569,7 +570,7 @@ public abstract class Actor
 	{
 		World world = getWorldUnsafe();
 		List<A> actors = world.getObjects(type);
-		List<A> retList = new ArrayList<A>();
+		List<A> retList = new ArrayList<>();
 		for(A actor : actors)
 			if(intersects(actor))
 				retList.add(actor);
@@ -604,11 +605,11 @@ public abstract class Actor
 	public final <A extends Actor> List<A> getObjectsAtOffset(float oX, float oY, Class<A> type, float range) throws NoWorldException
 	{
 		World world = getWorldUnsafe();
-		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
-		List<A> retList = new ArrayList<A>();
+		List<A> retList = new ArrayList<>();
 		float tX = getX() + oX;
 		float tY = getY() + oY;
+		range = Math.abs(range);
 		for(A actor : actors)
 			if(Green.getPointsDist(tX, tY, actor.getX(), actor.getY()) <= range)
 				retList.add(actor);
@@ -640,12 +641,12 @@ public abstract class Actor
 	public final <A extends Actor> A getOneObjectAtOffset(float oX, float oY, Class<A> type, float range) throws NoWorldException
 	{
 		World world = getWorldUnsafe();
-		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
 		float tX = getX() + oX;
 		float tY = getY() + oY;
+		range = Math.abs(range);
 		for(A actor : actors)
-			if(Green.getPointsDist(tX, tY, actor.getX(), actor.getY()) <= 1f /*CHANGE HERE LATER*/)
+			if(Green.getPointsDist(tX, tY, actor.getX(), actor.getY()) <= range)
 				return actor;
 		return null;
 	}
@@ -665,17 +666,17 @@ public abstract class Actor
 	/**
 	 * Retrieves a list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
 	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
-	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
 	 * @param type The type of {@link Actor} to match.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
 	 * @return A list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
 	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
-	public final <A extends Actor> List<A> getObjectsInRange(float range, Class<A> type) throws NoWorldException
+	public final <A extends Actor> List<A> getObjectsInRange(Class<A> type, float range) throws NoWorldException
 	{
 		World world = getWorldUnsafe();
-		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
-		List<A> retList = new ArrayList<A>();
+		List<A> retList = new ArrayList<>();
+		range = Math.abs(range);
 		for(A actor : actors)
 			if(Green.getPointsDist(_x, _y, actor.getX(), actor.getY()) <= range)
 				retList.add(actor);
@@ -684,16 +685,16 @@ public abstract class Actor
 	/**
 	 * Retrieves the first object in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
 	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
-	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
 	 * @param type The type of {@link Actor} to match.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
 	 * @return The first object in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
 	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
-	public final <A extends Actor> A getOneObjectInRange(float range, Class<A> type) throws NoWorldException
+	public final <A extends Actor> A getOneObjectInRange(Class<A> type, float range) throws NoWorldException
 	{
 		World world = getWorldUnsafe();
-		if(world == null) return null;
 		List<A> actors = world.getObjects(type);
+		range = Math.abs(range);
 		for(A actor : actors)
 			if(Green.getPointsDist(_x, _y, actor.getX(), actor.getY()) <= range)
 				return actor;
@@ -701,16 +702,16 @@ public abstract class Actor
 	}
 	/**
 	 * Retrieves a list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
-	 * Due to the difference in how this library and Greenfoot work, this is just an alias to {@link #getObjectsInRange(float, Class)}.
+	 * Due to the difference in how this library and Greenfoot work, this is just an alias to {@link #getObjectsInRange(Class, float)}.
 	 * @param <A> The type of {@link Actor} to return if possible, as defined by {@code type}.
-	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
 	 * @param type The type of {@link Actor} to match.
+	 * @param range The maximum distance an {@link Actor} can be from the offset point to match.
 	 * @return A list of all objects in the {@link World} matching {@code type} within {@code range} of the {@link Actor}.
 	 * @throws NoWorldException Thrown when the method is called and the {@link Actor} is not part of a {@link World}.
 	 */
-	public final <A extends Actor> List<A> getNeighbours(float range, Class<A> type) throws NoWorldException
+	public final <A extends Actor> List<A> getNeighbours(Class<A> type, float range) throws NoWorldException
 	{
-		return getObjectsInRange(range, type);
+		return getObjectsInRange(type, range);
 	}
 	/**
 	 * Rotates the {@link Actor} to face it's right side towards the position ({@code x}, {@code y}). Does nothing if the position provided is the position of the {@link Actor}.
@@ -734,35 +735,35 @@ public abstract class Actor
 	
 	//Mouse Methods
 	/**
-	 * Retrieves whether or not a specific mouse button is currently down on this {@link Actor}.
+	 * Retrieves whether a specific mouse button is currently down on this {@link Actor}.
 	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
-	 * @return Whether or not {@code mouseButton} is down.
+	 * @return Whether {@code mouseButton} is down.
 	 */
 	public final boolean isMouseButtonDownHere(int mouseButton)
 	{
 		return green.isMouseButtonDown(mouseButton) && pointInBounds(app.mouseX, app.mouseY);
 	}
 	/**
-	 * Retrieves whether or not a specific mouse button was pressed this frame on this {@link Actor}.
+	 * Retrieves whether a specific mouse button was pressed this frame on this {@link Actor}.
 	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
-	 * @return Whether or not {@code mouseButton} was pressed in this frame.
+	 * @return Whether {@code mouseButton} was pressed in this frame.
 	 */
 	public final boolean isMouseButtonDownThisFrameHere(int mouseButton)
 	{
 		return green.isMouseButtonDownThisFrame(mouseButton) && pointInBounds(app.mouseX, app.mouseY);
 	}
 	/**
-	 * Retrieves whether or not a specific mouse button was released this frame on this {@link Actor}.
+	 * Retrieves whether a specific mouse button was released this frame on this {@link Actor}.
 	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
-	 * @return Whether or not {@code mouseButton} was released in this frame.
+	 * @return Whether {@code mouseButton} was released in this frame.
 	 */
 	public final boolean isMouseButtonUpThisFrameHere(int mouseButton)
 	{
 		return green.isMouseButtonUpThisFrame(mouseButton) && pointInBounds(app.mouseX, app.mouseY);
 	}
 	/**
-	 * Retrieves whether or not the mouse is currently scrolling on this {@link Actor}.
-	 * @return Whether or not the mouse is currently scrolling.
+	 * Retrieves whether the mouse is currently scrolling on this {@link Actor}.
+	 * @return Whether the mouse is currently scrolling.
 	 */
 	public final boolean isMouseScrollingHere()
 	{
@@ -771,7 +772,7 @@ public abstract class Actor
 	
 	//Base Methods
 	/**
-	 * Renders the {@link Actor} to the screen. By default, this method renders the {@link Actor} with it's image, position, rotation, and opacity taken into account, but it can be overridden for further use.
+	 * Renders the {@link Actor} to the screen. By default, this method renders the {@link Actor} with its image, position, rotation, and opacity taken into account, but it can be overridden for further use.
 	 * When drawing, everything is relative to the {@link Actor}'s position.
 	 */
 	public void draw() //Overridable

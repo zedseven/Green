@@ -20,8 +20,8 @@ import static processing.core.PApplet.tan;
  */
 public final class Green
 {
-	private static Green instance;
-	private PApplet parent;
+	private static Green _instance;
+	private final PApplet _parent;
 	
 	private static World _currentWorld;
 	private static World _worldToLoad;
@@ -32,15 +32,15 @@ public final class Green
 	//Input-related stuff
 	private int _mouseX = 0;
 	private int _mouseY = 0;
-	private int _pmouseX = 0;
-	private int _pmouseY = 0;
-	private Set<Integer> _mouseButtonsDown = new HashSet<Integer>();
-	private Set<Integer> _mouseButtonsDownInFrame = new HashSet<Integer>();
-	private Set<Integer> _mouseButtonsUpInFrame = new HashSet<Integer>();
+	private int _previousMouseX = 0;
+	private int _previousMouseY = 0;
+	private final Set<Integer> _mouseButtonsDown = new HashSet<>();
+	private final Set<Integer> _mouseButtonsDownInFrame = new HashSet<>();
+	private final Set<Integer> _mouseButtonsUpInFrame = new HashSet<>();
 	private int _mouseScrollInFrame = 0;
-	private Set<InputKey> _keysDown = new HashSet<InputKey>();
-	private Set<InputKey> _keysDownInFrame = new HashSet<InputKey>();
-	private Set<InputKey> _keysUpInFrame = new HashSet<InputKey>();
+	private final Set<InputKey> _keysDown = new HashSet<>();
+	private final Set<InputKey> _keysDownInFrame = new HashSet<>();
+	private final Set<InputKey> _keysUpInFrame = new HashSet<>();
 	
 	//Image-resizing constants
 	/**
@@ -64,9 +64,9 @@ public final class Green
 	 */
 	public Green(PApplet theParent)
 	{
-		if(instance != null) throw new SingleInstanceException();
-		instance = this;
-		parent = theParent;
+		if(_instance != null) throw new SingleInstanceException();
+		_instance = this;
+		_parent = theParent;
 	}
 	
 	//Getters
@@ -76,7 +76,7 @@ public final class Green
 	 */
 	public static Green getInstance()
 	{
-		return instance;
+		return _instance;
 	}
 	/**
 	 * Retrieves the currently-loaded {@link World}.
@@ -92,7 +92,7 @@ public final class Green
 	 */
 	public PApplet getParent()
 	{
-		return parent;
+		return _parent;
 	}
 	/**
 	 * Retrieves the deltaTime - the time since the last frame.
@@ -139,7 +139,7 @@ public final class Green
 	 * @param b1y The Y-axis position of point 1 of line segment B.
 	 * @param b2x The X-axis position of point 2 of line segment B.
 	 * @param b2y The Y-axis position of point 2 of line segment B.
-	 * @return Whether or not the two line segments intersect.
+	 * @return Whether the two line segments intersect.
 	 */
 	public static boolean getLinesIntersect(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y)
 	{
@@ -224,10 +224,10 @@ public final class Green
 		if (w == src.width && h == src.height || (w <= 0 && h <= 0)) return src;
 		
 		//Scale dimension parameters
-		if (w <= 0) w = h * src.width / src.height | 0; //when only parameter w is 0
-		if (h <= 0) h = w * src.height / src.width | 0; //when only parameter h is 0
+		if (w <= 0) w = h * src.width / src.height; //when only parameter w is 0
+		if (h <= 0) h = w * src.height / src.width; //when only parameter h is 0
 		
-		PImage img = parent.createImage(w, h, src.format); //Create a temporary image with the same pixel format as the source
+		PImage img = _parent.createImage(w, h, src.format); //Create a temporary image with the same pixel format as the source
 		float sx = (float) w / src.width, sy = (float) h / src.height; //Scaled coords for current image
 		
 		src.loadPixels();
@@ -249,7 +249,7 @@ public final class Green
 			}
 		}
 		
-		img.updatePixels(); //Update the return image with it's new pixels[] array
+		img.updatePixels(); //Update the return image with its new pixels[] array
 		return img;
 	}
 	/**
@@ -268,7 +268,7 @@ public final class Green
 		//Quit prematurely if both dimensions are equal or parameters are both 0
 		if (w == src.width && h == src.height || (w <= 0 && h <= 0)) return src;
 		
-		PImage img = parent.createImage(w, h, src.format); //Create a temporary image with the same pixel format as the source
+		PImage img = _parent.createImage(w, h, src.format); //Create a temporary image with the same pixel format as the source
 		
 		int tW = (int) Math.ceil(w / src.width) + 1, tH = (int) Math.ceil((float) h / src.height) + 1;
 		for (int y = 0; y < tH; y++)
@@ -339,7 +339,7 @@ public final class Green
 	 */
 	public void handleAct() throws NoWorldException
 	{
-		long currentMillis = parent.millis();
+		long currentMillis = _parent.millis();
 		_deltaTime = (currentMillis - _lastMillis) / 1000f;
 		_lastMillis = currentMillis;
 		World world = getWorld();
@@ -353,9 +353,9 @@ public final class Green
 	}
 	//Input
 	/**
-	 * Handles all of the frame-by-frame input.
+	 * Handles all the frame-by-frame input.
 	 */
-	public final void handleInput()
+	public void handleInput()
 	{
 		_mouseButtonsDownInFrame.clear();
 		_mouseButtonsUpInFrame.clear();
@@ -368,7 +368,7 @@ public final class Green
 	 * Handles the event of a mouse button being pressed. Put this in the {@link PApplet#mousePressed()} event.
 	 * @param mouseButton The mouse button that was pressed - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}. Please pass in {@link PApplet#mouseButton} in your code.
 	 */
-	public final void handleMouseDown(int mouseButton)
+	public void handleMouseDown(int mouseButton)
 	{
 		if(!_mouseButtonsDown.contains(mouseButton))
 			_mouseButtonsDownInFrame.add(mouseButton);
@@ -378,7 +378,7 @@ public final class Green
 	 * Handles the event of a mouse button being released. Put this in the {@link PApplet#mouseReleased()} event.
 	 * @param mouseButton The mouse button that was released - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}. Please pass in {@link PApplet#mouseButton} in your code.
 	 */
-	public final void handleMouseUp(int mouseButton)
+	public void handleMouseUp(int mouseButton)
 	{
 		if(_mouseButtonsDown.contains(mouseButton))
 			_mouseButtonsUpInFrame.add(mouseButton);
@@ -386,15 +386,15 @@ public final class Green
 	}
 	/**
 	 * Handles the mouse position input. Just put this in your {@link PApplet#draw()} method.
-	 * @param pmouseX The mouse's previous X-axis position, in pixels. Please pass in {@link PApplet#pmouseX} in your code.
-	 * @param pmouseY The mouse's previous Y-axis position, in pixels. Please pass in {@link PApplet#pmouseY} in your code.
+	 * @param previousMouseX The mouse's previous X-axis position, in pixels. Please pass in {@link PApplet#pmouseX} in your code.
+	 * @param previousMouseY The mouse's previous Y-axis position, in pixels. Please pass in {@link PApplet#pmouseY} in your code.
 	 * @param mouseX The mouse's X-axis position, in pixels. Please pass in {@link PApplet#mouseX} in your code.
 	 * @param mouseY The mouse's Y-axis position, in pixels. Please pass in {@link PApplet#mouseY} in your code.
 	 */
-	public final void handleMousePosition(int pmouseX, int pmouseY, int mouseX, int mouseY)
+	public void handleMousePosition(int previousMouseX, int previousMouseY, int mouseX, int mouseY)
 	{
-		_pmouseX = pmouseX;
-		_pmouseY = pmouseY;
+		_previousMouseX = previousMouseX;
+		_previousMouseY = previousMouseY;
 		_mouseX = mouseX;
 		_mouseY = mouseY;
 	}
@@ -405,10 +405,10 @@ public final class Green
 	 * @deprecated Please use {@link #handleMousePosition(int, int, int, int)} instead.
 	 */
 	@Deprecated
-	public final void handleMousePosition(int mouseX, int mouseY)
+	public void handleMousePosition(int mouseX, int mouseY)
 	{
-		_pmouseX = _mouseX;
-		_pmouseY = _mouseY;
+		_previousMouseX = _mouseX;
+		_previousMouseY = _mouseY;
 		_mouseX = mouseX;
 		_mouseY = mouseY;
 	}
@@ -416,50 +416,50 @@ public final class Green
 	 * Handles when the mouse is scrolled. Put this in the {@link PApplet#mouseWheel(processing.event.MouseEvent)} event.
 	 * @param mouseScroll The amount that the mouse has scrolled this frame. Please pass in {@link MouseEvent#getCount()}.
 	 */
-	public final void handleMouseWheel(int mouseScroll)
+	public void handleMouseWheel(int mouseScroll)
 	{
 		_mouseScrollInFrame = mouseScroll;
 	}
 	/**
-	 * Retrieves whether or not the mouse has moved this frame.
-	 * @return Whether or not the mouse has moved this frame.
+	 * Retrieves whether the mouse has moved this frame.
+	 * @return Whether the mouse has moved this frame.
 	 */
-	public final boolean isMouseMoving()
+	public boolean isMouseMoving()
 	{
-		return _pmouseX != _mouseX || _pmouseY != _mouseY;
+		return _previousMouseX != _mouseX || _previousMouseY != _mouseY;
 	}
 	/**
 	 * Calculates the mouse's speed from last frame to this frame. This may not be very reliable, since it is calculated from frame-to-frame.
 	 * @return The mouse's speed from last frame to this frame, in pixels/second.
 	 */
-	public final float getMouseSpeed()
+	public float getMouseSpeed()
 	{
-		return ((float) Math.hypot(_mouseX - _pmouseX, _mouseY - _pmouseY)) / _deltaTime;
+		return ((float) Math.hypot(_mouseX - _previousMouseX, _mouseY - _previousMouseY)) / _deltaTime;
 	}
 	/**
-	 * Retrieves whether or not a specific mouse button is currently down.
+	 * Retrieves whether a specific mouse button is currently down.
 	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
-	 * @return Whether or not {@code mouseButton} is down.
+	 * @return Whether {@code mouseButton} is down.
 	 */
-	public final boolean isMouseButtonDown(int mouseButton)
+	public boolean isMouseButtonDown(int mouseButton)
 	{
 		return _mouseButtonsDown.contains(mouseButton);
 	}
 	/**
-	 * Retrieves whether or not a specific mouse button was pressed this frame.
+	 * Retrieves whether a specific mouse button was pressed this frame.
 	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
-	 * @return Whether or not {@code mouseButton} was pressed in this frame.
+	 * @return Whether {@code mouseButton} was pressed in this frame.
 	 */
-	public final boolean isMouseButtonDownThisFrame(int mouseButton)
+	public boolean isMouseButtonDownThisFrame(int mouseButton)
 	{
 		return _mouseButtonsDownInFrame.contains(mouseButton);
 	}
 	/**
-	 * Retrieves whether or not a specific mouse button was released this frame.
+	 * Retrieves whether a specific mouse button was released this frame.
 	 * @param mouseButton The mouse button to check for - either {@link PConstants#LEFT}, {@link PConstants#CENTER}, or {@link PConstants#RIGHT}.
-	 * @return Whether or not {@code mouseButton} was released in this frame.
+	 * @return Whether {@code mouseButton} was released in this frame.
 	 */
-	public final boolean isMouseButtonUpThisFrame(int mouseButton)
+	public boolean isMouseButtonUpThisFrame(int mouseButton)
 	{
 		return _mouseButtonsUpInFrame.contains(mouseButton);
 	}
@@ -467,15 +467,15 @@ public final class Green
 	 * Retrieves the amount that the mouse scrolled in this frame.
 	 * @return The amount that the mouse scrolled in this frame.
 	 */
-	public final int getMouseScroll()
+	public int getMouseScroll()
 	{
 		return _mouseScrollInFrame;
 	}
 	/**
-	 * Retrieves whether or not the mouse is currently scrolling.
-	 * @return Whether or not the mouse is currently scrolling.
+	 * Retrieves whether the mouse is currently scrolling.
+	 * @return Whether the mouse is currently scrolling.
 	 */
-	public final boolean isMouseScrolling()
+	public boolean isMouseScrolling()
 	{
 		return _mouseScrollInFrame != 0;
 	}
@@ -487,7 +487,7 @@ public final class Green
 	 * @param keyCode The key code of the key that was pressed. Please pass in {@link PApplet#keyCode} in your code.
 	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
-	public final void handleKeyDown(char key, int keyCode)
+	public void handleKeyDown(char key, int keyCode)
 	{
 		InputKey newKey = new InputKey(key, keyCode);
 		if(!_keysDown.contains(newKey))
@@ -500,7 +500,7 @@ public final class Green
 	 * @param keyCode The key code of the key that was released. Please pass in {@link PApplet#keyCode} in your code.
 	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
-	public final void handleKeyUp(char key, int keyCode)
+	public void handleKeyUp(char key, int keyCode)
 	{
 		InputKey newKey = new InputKey(key, keyCode);
 		if(_keysDown.contains(newKey))
@@ -510,9 +510,9 @@ public final class Green
 	/**
 	 * Retrieves whether a specific key is currently down.
 	 * @param key The {@code char} representation of the key to check for.
-	 * @return Whether or not {@code key} is currently down.
+	 * @return Whether {@code key} is currently down.
 	 */
-	public final boolean isKeyDown(char key)
+	public boolean isKeyDown(char key)
 	{
 		List<InputKey> result = _keysDown.stream()
 				.filter(item -> item.getKey() == key)
@@ -522,10 +522,10 @@ public final class Green
 	/**
 	 * Retrieves whether a specific key is currently down.
 	 * @param keyCode The key code of the key to check for.
-	 * @return Whether or not {@code key} is currently down.
+	 * @return Whether {@code key} is currently down.
 	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
-	public final boolean isKeyDown(int keyCode)
+	public boolean isKeyDown(int keyCode)
 	{
 		List<InputKey> result = _keysDown.stream()
 				.filter(item -> item.getKeyCode() == keyCode)
@@ -535,18 +535,18 @@ public final class Green
 	/**
 	 * Retrieves whether a specific key is currently down.
 	 * @param key The key to check for.
-	 * @return Whether or not {@code key} is currently down.
+	 * @return Whether {@code key} is currently down.
 	 */
-	public final boolean isKeyDown(InputKey key)
+	public boolean isKeyDown(InputKey key)
 	{
 		return _keysDown.contains(key);
 	}
 	/**
-	 * Retrieves whether or not a specific key was pressed this frame.
+	 * Retrieves whether a specific key was pressed this frame.
 	 * @param key The {@code char} representation of the key to check for.
-	 * @return Whether or not {@code key} was pressed in this frame.
+	 * @return Whether {@code key} was pressed in this frame.
 	 */
-	public final boolean isKeyDownThisFrame(char key)
+	public boolean isKeyDownThisFrame(char key)
 	{
 		List<InputKey> result = _keysDownInFrame.stream()
 				.filter(item -> item.getKey() == key)
@@ -554,12 +554,12 @@ public final class Green
 		return result.size() > 0;
 	}
 	/**
-	 * Retrieves whether or not a specific key was pressed this frame.
+	 * Retrieves whether a specific key was pressed this frame.
 	 * @param keyCode The key code of the key to check for.
-	 * @return Whether or not {@code key} was pressed in this frame.
+	 * @return Whether {@code key} was pressed in this frame.
 	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
-	public final boolean isKeyDownThisFrame(int keyCode)
+	public boolean isKeyDownThisFrame(int keyCode)
 	{
 		List<InputKey> result = _keysDownInFrame.stream()
 				.filter(item -> item.getKeyCode() == keyCode)
@@ -567,20 +567,20 @@ public final class Green
 		return result.size() > 0;
 	}
 	/**
-	 * Retrieves whether or not a specific key was pressed this frame.
+	 * Retrieves whether a specific key was pressed this frame.
 	 * @param key The key to check for.
-	 * @return Whether or not {@code key} was pressed in this frame.
+	 * @return Whether {@code key} was pressed in this frame.
 	 */
-	public final boolean isKeyDownThisFrame(InputKey key)
+	public boolean isKeyDownThisFrame(InputKey key)
 	{
 		return _keysDownInFrame.contains(key);
 	}
 	/**
-	 * Retrieves whether or not a specific key was released this frame.
+	 * Retrieves whether a specific key was released this frame.
 	 * @param key The {@code char} representation of the key to check for.
-	 * @return Whether or not {@code key} was released in this frame.
+	 * @return Whether {@code key} was released in this frame.
 	 */
-	public final boolean isKeyUpThisFrame(char key)
+	public boolean isKeyUpThisFrame(char key)
 	{
 		List<InputKey> result = _keysUpInFrame.stream()
 				.filter(item -> item.getKey() == key)
@@ -588,12 +588,12 @@ public final class Green
 		return result.size() > 0;
 	}
 	/**
-	 * Retrieves whether or not a specific key was released this frame.
+	 * Retrieves whether a specific key was released this frame.
 	 * @param keyCode The key code of the key to check for.
-	 * @return Whether or not {@code key} was released in this frame.
+	 * @return Whether {@code key} was released in this frame.
 	 * @see <a href="https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html">Java KeyEvent reference</a>
 	 */
-	public final boolean isKeyUpThisFrame(int keyCode)
+	public boolean isKeyUpThisFrame(int keyCode)
 	{
 		List<InputKey> result = _keysUpInFrame.stream()
 				.filter(item -> item.getKeyCode() == keyCode)
@@ -601,13 +601,12 @@ public final class Green
 		return result.size() > 0;
 	}
 	/**
-	 * Retrieves whether or not a specific key was released this frame.
+	 * Retrieves whether a specific key was released this frame.
 	 * @param key The key to check for.
-	 * @return Whether or not {@code key} was released in this frame.
+	 * @return Whether {@code key} was released in this frame.
 	 */
-	public final boolean isKeyUpThisFrame(InputKey key)
+	public boolean isKeyUpThisFrame(InputKey key)
 	{
 		return _keysUpInFrame.contains(key);
 	}
 }
-
