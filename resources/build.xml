@@ -132,7 +132,16 @@
 		<delete dir="${sketchbook.location}/${folder}/${project.name}" />
 		<mkdir dir="${sketchbook.location}/${folder}/${project.name}" />
 		<copy todir="${sketchbook.location}/${folder}/${project.name}">
-			<fileset dir="${project.tmp}/${project.name}"/>
+			<fileset dir="${project.tmp}/${project.name}">
+				<!--
+					https://github.com/processing/processing-library-template/pull/31
+					To avoid the following error in Processing 4.0 and newer:
+					The library "${project.name}" cannot be used
+					because it contains the processing.core libraries.
+					Please contact the library author for an update.
+				 -->
+				<exclude name="**/core.jar"/>
+			</fileset>
 		</copy>
 	</target>
 
