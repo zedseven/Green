@@ -1,5 +1,5 @@
 /**
- * A simple library for Processing to emulate Greenfoot functionality.
+ * Easy, simple 2D game creation within Processing.
  * @author Zacchary Dempsey-Plante
  */
 package Green;

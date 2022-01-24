@@ -198,12 +198,17 @@ public final class Green
 	//Utility Methods
 	/**
 	 * Calculates the number of digits in a given integer.
+	 * If {@code value} is {@code 0}, {@code 1} is returned. If {@code value} is negative, the negative sign is ignored.
 	 * @param value The integer to measure the number of digits of.
 	 * @return The number of digits in {@code value}.
 	 */
 	public static int getDigits(int value)
 	{
-		return String.valueOf(value).length();
+		if(value < 0)
+			value = -value;
+		if(value == 0)
+			return 1;
+		return (int) (Math.log10(value) + 1e-10) + 1;
 	}
 	/**
 	 * A nearest-neighbour resizing implementation. This is great for resizing pixel art while keeping it looking crisp and sharp.
