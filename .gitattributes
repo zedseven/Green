@@ -1,5 +1,5 @@
-distribution/reference/* linguist-documentation
-distribution/*           linguist-generated
-resources/*              linguist-vendored
-web/*                    linguist-vendored
-*.pde                    linguist-detectable=true
+distribution/**/reference/ linguist-documentation
+distribution/              linguist-generated
+resources/                 linguist-vendored
+web/                       linguist-vendored
+*.pde                      linguist-detectable=true
