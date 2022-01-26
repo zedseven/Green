@@ -181,7 +181,10 @@
 			<fileset dir="${project.src}"/>
 		</copy>
 		<copy todir="${project.tmp}/${project.name}/${folder}">
-			<fileset dir="${project.lib}" excludes="README" />
+            <fileset dir="${project.lib}">
+                <exclude name="README"/>
+                <exclude name="**/core.jar"/>
+            </fileset>
 		</copy>
 	</target>
 
