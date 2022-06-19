@@ -752,6 +752,7 @@ public abstract class World
 			app.background(_backgroundColour);
 		}
 		app.fill(-16777216); //app.color(0, 0, 0)
+		app.tint(255, 255);
 		if(_backgroundImage != null)
 			app.image(_backgroundImage, 0, 0, _width, _height);
 		_actors.sort((a1, a2) -> Math.round(a1.getZ() - a2.getZ()));
