@@ -18,8 +18,8 @@ public abstract class World
 	private int _width;
 	private int _height;
 	
-	private int _backgroundColour = -1; //app.color(255, 255, 255);
-	private int _outOfBoundsColour = -16777216;
+	private int _backgroundColour = 0xFFFFFFFF;
+	private int _outOfBoundsColour = 0xFF000000;
 	private PImage _sourceBackgroundImage = null;
 	private PImage _backgroundImage = null;
 	private boolean _unbounded = false;
@@ -751,7 +751,7 @@ public abstract class World
 		{
 			app.background(_backgroundColour);
 		}
-		app.fill(-16777216); //app.color(0, 0, 0)
+		app.fill(0xFF000000);
 		app.tint(255, 255);
 		if(_backgroundImage != null)
 			app.image(_backgroundImage, 0, 0, _width, _height);

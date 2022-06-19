@@ -30,6 +30,8 @@ public abstract class Actor
 	private int _height;
 	private float _opacity = 255;
 	private int _resizeFormat = Green.NEAREST_NEIGHBOR;
+
+	private static final int GREEN_COLOUR = 0xFF4D975B;
 	
 	//Constructors
 	/**
@@ -788,7 +790,7 @@ public abstract class Actor
 		}
 		else
 		{
-			app.fill(-11692197); //color(77, 151, 91)
+			app.fill(GREEN_COLOUR);
 			app.rect(-_width / 2f, -_height / 2f, _width, _height);
 		}
 	}
