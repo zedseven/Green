@@ -89,6 +89,7 @@
 		</echo>
 
 
+		<mkdir dir="${project.lib}"/>
 		<mkdir dir="${project.bin}"/>
 	</target>
 
@@ -153,9 +154,9 @@
 			</classpath>
 			<compilerarg value="-Xlint"/>
 		</javac>
-		<copy todir="${project.bin.data}">
-			<fileset dir="${project.data}" excludes="README" />
-		</copy>
+		<!-- <copy todir="${project.bin.data}"> -->
+		<!-- 	<fileset dir="${project.data}" excludes="README" /> -->
+		<!-- </copy> -->
 	</target>
 
 
@@ -223,7 +224,7 @@
 	<target name="generate.javadoc" if="is.normal">
 		<!-- create the java reference of the Library -->
 		<javadoc bottom="Processing Library ${project.name} by ${author.name}. ${library.copyright}"
-				 classpath="${classpath.local.location}/core.jar;{project.bin}"
+				 classpath="${classpath.local.location}/${classpath.local.include};{project.bin}"
 				 destdir="${project.tmp}/${project.name}/reference"
 				 verbose="false"
 				 stylesheetfile="resources/stylesheet.css"
