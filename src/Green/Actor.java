@@ -527,14 +527,14 @@ public abstract class Actor
 				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RDX, c2RDY, c2LDX, c2LDY) || 
 				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RDX, c2RDY, c2LDX, c2LDY) || 
 				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RDX, c2RDY, c2LDX, c2LDY) || 
-				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2RUX, c2LUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RUX, c2LUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RUX, c2LUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RUX, c2LUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2RUX, c2RUY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RUX, c2RUY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RUX, c2RUY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RUX, c2RUY, c2LUX, c2LUY)
+				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2LUX, c2LUY, c2RUX, c2RUY) || 
+				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2LUX, c2LUY, c2RUX, c2RUY) || 
+				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2LUX, c2LUY, c2RUX, c2RUY) || 
+				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2LUX, c2LUY, c2RUX, c2RUY) || 
+				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2RUX, c2RUY, c2RDX, c2RDY) || 
+				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RUX, c2RUY, c2RDX, c2RDY) || 
+				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RUX, c2RUY, c2RDX, c2RDY) || 
+				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RUX, c2RUY, c2RDX, c2RDY)
 			);
 	}
 	/**
