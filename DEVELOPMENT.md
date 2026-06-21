@@ -1,12 +1,17 @@
 # Development
-Whenever working on a new feature, bump the version locally in [`build.properties`](resources/build.properties) so
+Whenever working on a new feature, bump the version locally in [`build.properties`](/resources/build.properties) so
 previous builds aren't overwritten.
 
 
-To build the project, run the Ant build target `clean`.
+To build the project, run the Ant build target `clean` from inside the [`resources`](/resources) directory.
 
 It's ill-named, but it cleans the project, builds the new version, generates the documentation, packages it up, and puts
-everything in the [`distribution`](distribution) folder.
+everything in the `distribution` folder.
+
+
+This project now uses [`nix-direnv`](https://github.com/nix-community/nix-direnv) to manage its development environment.
+
+When Processing and the `flake.lock` are updated, it may be necessary to update the hash in the name of `core.jar` in [`build.properties`](/resources/build.properties)' `classpath.local.include` value.
 
 
 # Releasing a New Version
