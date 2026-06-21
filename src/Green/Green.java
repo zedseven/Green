@@ -299,9 +299,9 @@ public final class Green
 		
 		return img;
 	}
-	private static float isLeft(float p0x, float p0y, float p1x, float p1y, float p2x, float p2y)
+	private static boolean isLeft(float p0x, float p0y, float p1x, float p1y, float p2x, float p2y)
 	{
-	    return ((p1x - p0x) * (p2y - p0y) - (p2x - p0x) * (p1y - p0y));
+	    return ((p1x - p0x) * (p2y - p0y) - (p2x - p0x) * (p1y - p0y)) >= 0f;
 	}
 	/**
 	 * Checks whether a point ({@code pPx}, {@code pPy}) is within the bounds of a rectangle (({@code pXx}, {@code pXy}), ({@code pYx}, {@code pYy}), ({@code pZx}, {@code pZy}), ({@code pWx}, {@code pWy})) where the points are provided in clockwise order.
@@ -320,7 +320,7 @@ public final class Green
 	 */
 	public static boolean pointInRectangle(float pXx, float pXy, float pYx, float pYy, float pZx, float pZy, float pWx, float pWy, float pPx, float pPy)
 	{
-	    return (isLeft(pXx, pXy, pYx, pYy, pPx, pPy) > 0 && isLeft(pYx, pYy, pZx, pZy, pPx, pXy) > 0 && isLeft(pZx, pZy, pWx, pWy, pPx, pPy) > 0 && isLeft(pWx, pWy, pXx, pXy, pPx, pPy) > 0);
+	    return (isLeft(pXx, pXy, pYx, pYy, pPx, pPy) && isLeft(pYx, pYy, pZx, pZy, pPx, pPy) && isLeft(pZx, pZy, pWx, pWy, pPx, pPy) && isLeft(pWx, pWy, pXx, pXy, pPx, pPy));
 	}
 	
 	//Base Methods
