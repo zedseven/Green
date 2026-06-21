@@ -143,6 +143,8 @@ public final class Green
 	 */
 	public static boolean getLinesIntersect(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y)
 	{
+		final float EPSILON = 1e-6f;
+
 		float iX;
 		float iY;
 		
@@ -151,16 +153,31 @@ public final class Green
 		float bM = (b2y - b1y) / (b2x - b1x);
 		float bB = b1y - bM * b1x;
 		
-		if (a1x == a2x) iX = a1x;
-		else if (b1x == b2x) iX = b1x;
+		// Set the X intercept
+		// If one of the lines is vertical, the X intercept is that line's X value
+		if (Math.abs(a2x - a1x) < EPSILON)
+			iX = a1x;
+		else if (Math.abs(b2x - b1x) < EPSILON)
+			iX = b1x;
 		else
 		{
-			if (aM == bM) return false;
+			if (Math.abs(bM - aM) < EPSILON)
+				return false;
 			
 			iX = (bB - aB) / (aM - bM);
 			//float iY = aM * iX + aB;
 		}
-		iY = !Float.isNaN(aM) && !Float.isInfinite(aM) ? aM * iX + aB : bM * iX + bB;
+
+		// Calculate the Y intercept based on the X intercept
+		if (!Float.isNaN(aM) && !Float.isInfinite(aM))
+			iY = aM * iX + aB;
+		else if (!Float.isNaN(bM) && !Float.isInfinite(bM))
+			iY = bM * iX + bB;
+		else
+		{
+			// Both lines are vertical (and at different x-coordinates)
+			return false;
+		}
 		
 		return Math.min(a1x, a2x) <= iX && iX <= Math.max(a1x, a2x) && Math.min(b1x, b2x) <= iX && iX <= Math.max(b1x, b2x) &&
 		       Math.min(a1y, a2y) <= iY && iY <= Math.max(a1y, a2y) && Math.min(b1y, b2y) <= iY && iY <= Math.max(b1y, b2y);
