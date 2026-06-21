@@ -175,3 +175,6 @@ lib/
 .project
 .classpath
 core.jar
+
+# direnv directory
+/.direnv
