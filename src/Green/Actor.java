@@ -518,23 +518,18 @@ public abstract class Actor
 		float c2LUX = (-edge2X * rot2Cos + edge2Y * rot2Sin) + actor.getX();
 		float c2LUY = (-edge2X * rot2Sin - edge2Y * rot2Cos) + actor.getY();
 		
-		return (
-				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2LDX, c2LDY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2LDX, c2LDY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2LDX, c2LDY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2LDX, c2LDY, c2LUX, c2LUY) || 
-				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2RDX, c2RDY, c2LDX, c2LDY) || 
-				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RDX, c2RDY, c2LDX, c2LDY) || 
-				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RDX, c2RDY, c2LDX, c2LDY) || 
-				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RDX, c2RDY, c2LDX, c2LDY) || 
-				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2LUX, c2LUY, c2RUX, c2RUY) || 
-				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2LUX, c2LUY, c2RUX, c2RUY) || 
-				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2LUX, c2LUY, c2RUX, c2RUY) || 
-				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2LUX, c2LUY, c2RUX, c2RUY) || 
-				Green.getLinesIntersect(c1LDX, c1LDY, c1LUX, c1LUY, c2RUX, c2RUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1RDX, c1RDY, c1LDX, c1LDY, c2RUX, c2RUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1LUX, c1LUY, c1RUX, c1RUY, c2RUX, c2RUY, c2RDX, c2RDY) || 
-				Green.getLinesIntersect(c1RUX, c1RUY, c1RDX, c1RDY, c2RUX, c2RUY, c2RDX, c2RDY)
+		return 
+			(
+				Green.pointInRectangle(c1LUX, c1LUY, c1RUX, c1RUY, c1RDX, c1RDY, c1LDX, c1LDY, c2LUX, c2LUY) ||
+				Green.pointInRectangle(c1LUX, c1LUY, c1RUX, c1RUY, c1RDX, c1RDY, c1LDX, c1LDY, c2RUX, c2RUY) ||
+				Green.pointInRectangle(c1LUX, c1LUY, c1RUX, c1RUY, c1RDX, c1RDY, c1LDX, c1LDY, c2RDX, c2RDY) ||
+				Green.pointInRectangle(c1LUX, c1LUY, c1RUX, c1RUY, c1RDX, c1RDY, c1LDX, c1LDY, c2LDX, c2LDY)
+			) ||
+			(
+				Green.pointInRectangle(c2LUX, c2LUY, c2RUX, c2RUY, c2RDX, c2RDY, c2LDX, c2LDY, c1LUX, c1LUY) ||
+				Green.pointInRectangle(c2LUX, c2LUY, c2RUX, c2RUY, c2RDX, c2RDY, c2LDX, c2LDY, c1RUX, c1RUY) ||
+				Green.pointInRectangle(c2LUX, c2LUY, c2RUX, c2RUY, c2RDX, c2RDY, c2LDX, c2LDY, c1RDX, c1RDY) ||
+				Green.pointInRectangle(c2LUX, c2LUY, c2RUX, c2RUY, c2RDX, c2RDY, c2LDX, c2LDY, c1LDX, c1LDY)
 			);
 	}
 	/**
